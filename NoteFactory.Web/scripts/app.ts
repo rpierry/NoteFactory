@@ -19,27 +19,36 @@ ChangeVolume();
 ChangeFrequency();
 
 let playing = false;
+let timerId: number;
 
 function Play() {
     if (playing) return;
     playing = true;
 
+    ScheduleNote();    
+}
+
+function ScheduleNote() {
     let n =
         new ScheduledNote(
             parseFloat(txtFreq.value),
             ctx.currentTime + 0.5,
-            1,
+            0.5,
             ctx,
             gainNode,
             () => {
                 console.log("done playing!");
-                playing = false;
+                //playing = false;
             });
+
+    timerId = setTimeout(ScheduleNote, 1000);
 }
 
 function Stop() {
     if (!playing) return;
     playing = false;
+
+    clearTimeout(timerId);
 }
 
 function ChangeFrequency() {
