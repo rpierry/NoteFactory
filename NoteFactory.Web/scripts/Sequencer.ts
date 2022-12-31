@@ -104,6 +104,16 @@ class Sequencer {
             this._pattern[step].splice(i, 1);
         }
     }
+
+    mapNotes(fn: (note: SameAs) => SameAs) {
+        for (var i = 0; i < this._pattern.length; i++) {
+            let n = new Array<SameAs>;
+            for (var j = 0; j < this._pattern[i].length; j++) {
+                n.push(fn(this._pattern[i][j]));
+            }
+            this._pattern[i] = n;
+        }
+    }
 }
 
 export { Sequencer, TimeSource, SameAs };

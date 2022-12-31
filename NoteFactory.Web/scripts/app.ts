@@ -6,6 +6,7 @@ import { Note, NoteName, Octave } from "./Note.js";
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");
 const btnToggle: HTMLButtonElement = document.querySelector("#toggle");
+const btnTestMap: HTMLButtonElement = document.querySelector("#testMap");
 const txtFreq: HTMLInputElement = document.querySelector("#freq");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
@@ -13,6 +14,7 @@ const rngBpm: HTMLInputElement = document.querySelector("#bpm");
 btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
 btnToggle.addEventListener("click", Toggle);
+btnTestMap.addEventListener("click", TestMap);
 txtFreq.addEventListener("change", ChangeFrequency, false);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
@@ -46,7 +48,7 @@ function ScheduleNotes(startTime: number, notes: Note[]) {
     for (let n of notes) {
         let sn =
             new ScheduledNote(
-                n.noteName,
+                n.getFrequency(),
                 startTime,
                 n.beatDuration * sequencer.getSecondsPerBeat() * 0.9,
                 ctx,
@@ -83,4 +85,13 @@ function Toggle() {
         sequencer.addToStep(0, n);
     }
     incl = !incl;
+}
+
+let up = true;
+function TestMap() {
+    let mod = up ? 1 : -1;
+
+    sequencer.mapNotes((n: Note) => new Note(n.noteName, (n.octave + mod) as Octave, n.beatDuration));
+
+    up = !up;
 }

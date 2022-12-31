@@ -28,9 +28,10 @@ class Note implements SameAs {
     readonly octave: Octave = 4;
 
     getFrequency() {
-        return this.octave >= 4 ?
-            this.noteName * (2 << (this.octave - 4)) :
-            this.noteName / (2 << (4 - this.octave));
+        return this.octave == 4 ? this.noteName :
+            this.octave > 4 ?
+                this.noteName * (2 << (this.octave - 4 - 1)) :
+                this.noteName / (2 << (4 - this.octave - 1));
     }
 
 }
