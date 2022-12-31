@@ -4,15 +4,27 @@ interface TimeSource {
 }
 
 enum NoteName {
-    A = 440,    
+    C = 261.63,
+    D = 293.67,
+    E = 329.63,
+    F = 349.23,
+    G = 392,
+    A = 440,
+    B = 493.88
 }
 
 type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 class Note {
-    beatDuration: number = 1;
-    noteName: NoteName = NoteName.A;
-    octave: Octave = 4;
+    constructor(name: NoteName, oct: Octave, beats: number) {
+        this.noteName = name;
+        this.octave = oct;
+        this.beatDuration = beats;
+    }
+
+    readonly beatDuration: number = 1;
+    readonly noteName: NoteName = NoteName.A;
+    readonly octave: Octave = 4;
 
     getFrequency() {
         return this.octave >= 4 ?
@@ -28,6 +40,10 @@ class Sequencer {
     constructor(timeSource: TimeSource, noteHandler: (startTime: number, notes: Note[]) => void) {
         this._timeSource = timeSource;
         this._noteHandler = noteHandler;
+        this._pattern = [];
+        for (var i = 0; i < this._steps; i++) {
+            this._pattern[i] = new Array<Note>();
+        }
     }
 
     private _steps: number = 8;
@@ -41,7 +57,7 @@ class Sequencer {
         //setup _pattern
     }
 
-    private _pattern = [ true, false, true, false, false, true, true, false ];
+    private _pattern: Note[][];
 
     private _bpm: number = 120;
     get bpm() {
@@ -73,8 +89,8 @@ class Sequencer {
 
     private scheduleNotes() {        
         while (this._nextStepTime < this._timeSource.currentTime + this._scheduleAheadSeconds) {
-            if (this._pattern[this._currentStep]) {
-                this._noteHandler(this._nextStepTime, [new Note()]);
+            if (this._pattern[this._currentStep].length > 0) {
+                this._noteHandler(this._nextStepTime, this._pattern[this._currentStep]);
             }
 
             this._nextStepTime += this.getSecondsPerBeat();
@@ -89,6 +105,33 @@ class Sequencer {
         console.log("Sequencer stopping!");
 
         clearTimeout(this._timerId);
+    }
+
+    private contains(notes: Note[], note: Note): number {
+        for (var i = 0; i < notes.length; i++) {
+            if ((notes[i].noteName == note.noteName) &&
+                (notes[i].octave == note.octave)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    addToStep(step: number, note: Note) {
+        if (step >= this._steps) return; //ignore invalid step
+
+        if (this.contains(this._pattern[step], note) == -1) {
+            this._pattern[step].push(note);
+        }
+    }
+
+    removeFromStep(step: number, note: Note) {
+        if (step >= this._steps) return; //ignore invalid
+
+        let i = this.contains(this._pattern[step], note);
+        if (i != -1) {
+            this._pattern[step].splice(i, 1);
+        }
     }
 }
 
