@@ -1,6 +1,7 @@
 ﻿
 import { ScheduledNote } from "./ScheduledNote.js";
-import { Sequencer, Note, TimeSource, NoteName, Octave } from "./Sequencer.js";
+import { Sequencer, TimeSource } from "./Sequencer.js";
+import { Note, NoteName, Octave } from "./Note.js";
 
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");

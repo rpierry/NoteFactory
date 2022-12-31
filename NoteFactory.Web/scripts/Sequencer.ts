@@ -3,46 +3,19 @@ interface TimeSource {
     currentTime: number;
 }
 
-enum NoteName {
-    C = 261.63,
-    D = 293.67,
-    E = 329.63,
-    F = 349.23,
-    G = 392,
-    A = 440,
-    B = 493.88
-}
-
-type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-
-class Note {
-    constructor(name: NoteName, oct: Octave, beats: number) {
-        this.noteName = name;
-        this.octave = oct;
-        this.beatDuration = beats;
-    }
-
-    readonly beatDuration: number = 1;
-    readonly noteName: NoteName = NoteName.A;
-    readonly octave: Octave = 4;
-
-    getFrequency() {
-        return this.octave >= 4 ?
-                this.noteName * (2 << (this.octave - 4)) :
-                this.noteName / (2 << (4 - this.octave));
-    }
-
+interface SameAs {
+    sameAs(other: SameAs): boolean;
 }
 
 class Sequencer {
     private readonly _timeSource;
     private readonly _noteHandler;
-    constructor(timeSource: TimeSource, noteHandler: (startTime: number, notes: Note[]) => void) {
+    constructor(timeSource: TimeSource, noteHandler: (startTime: number, notes: SameAs[]) => void) {
         this._timeSource = timeSource;
         this._noteHandler = noteHandler;
         this._pattern = [];
         for (var i = 0; i < this._steps; i++) {
-            this._pattern[i] = new Array<Note>();
+            this._pattern[i] = new Array<SameAs>();
         }
     }
 
@@ -57,7 +30,7 @@ class Sequencer {
         //setup _pattern
     }
 
-    private _pattern: Note[][];
+    private _pattern: SameAs[][];
 
     private _bpm: number = 120;
     get bpm() {
@@ -102,22 +75,20 @@ class Sequencer {
     stop() {
         if (!this._playing) return;
         this._playing = false;
-        console.log("Sequencer stopping!");
 
         clearTimeout(this._timerId);
     }
 
-    private contains(notes: Note[], note: Note): number {
+    private contains(notes: SameAs[], note: SameAs): number {
         for (var i = 0; i < notes.length; i++) {
-            if ((notes[i].noteName == note.noteName) &&
-                (notes[i].octave == note.octave)) {
+            if (notes[i].sameAs(note)) {
                 return i;
             }
         }
         return -1;
     }
 
-    addToStep(step: number, note: Note) {
+    addToStep(step: number, note: SameAs) {
         if (step >= this._steps) return; //ignore invalid step
 
         if (this.contains(this._pattern[step], note) == -1) {
@@ -125,7 +96,7 @@ class Sequencer {
         }
     }
 
-    removeFromStep(step: number, note: Note) {
+    removeFromStep(step: number, note: SameAs) {
         if (step >= this._steps) return; //ignore invalid
 
         let i = this.contains(this._pattern[step], note);
@@ -135,4 +106,4 @@ class Sequencer {
     }
 }
 
-export { Sequencer, Note, TimeSource, NoteName, Octave };
+export { Sequencer, TimeSource, SameAs };
