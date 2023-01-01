@@ -27,8 +27,7 @@ class Envelope {
     private _sustainLevel = 0.5;
     get sustainLevel() { return this._sustainLevel; }
     set sustainLevel(val: number) {
-        this.throwIfNotPercentage("sustainLevel", val);
-        if (val > this._attackLevel) throw new Error("sustainLevel must be less than attackLevel");
+        this.throwIfNotPercentage("sustainLevel", val);        
         this._sustainLevel = val;
     }
     

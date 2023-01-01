@@ -40,6 +40,7 @@ sequencer.addToStep(6, new Note(NoteName.G, 4, 1));
 
 const synthesizer = new Synthesizer(ctx);
 ChangeVolume();
+SetADRTimes();
 
 let playing = false;
 
@@ -87,23 +88,36 @@ function Toggle() {
     incl = !incl;
 }
 
+function SetADRTimes() {
+    //treat times as a percentage of overall beat length
+    //convert to actual seconds based on current BPM and set
+    let secondsPerBeat = sequencer.getSecondsPerBeat();
+    let attackTime = parseFloat(rngAttackTime.value);
+    let decayTime = parseFloat(rngDecayTime.value);
+    let releaseTime = parseFloat(rngReleaseTime.value);
+
+    let total = attackTime + decayTime + releaseTime;
+    let factor = total > 1 ? (1.0 / total) : 1.0;
+
+    synthesizer.envelope.attackTime = attackTime * factor * secondsPerBeat;
+    synthesizer.envelope.decayTime = decayTime * factor * secondsPerBeat;
+    synthesizer.envelope.releaseTime = releaseTime * factor * secondsPerBeat;
+}
+
 function ChangeEnvelope(this: HTMLInputElement, ev: Event) {
-    let valAsFloat = parseFloat(this.value);
+    let valAsFloat = parseFloat(this.value);    
+
     switch (this.id) {
         case "attackLevel":
             synthesizer.envelope.attackLevel = valAsFloat;
             break;
-        case "attackTime":
-            synthesizer.envelope.attackTime = valAsFloat;
-            break;
-        case "decayTime":
-            synthesizer.envelope.decayTime = valAsFloat;
-            break;
         case "sustainLevel":
             synthesizer.envelope.sustainLevel = valAsFloat;
             break;
+        case "attackTime":
+        case "decayTime":
         case "releaseTime":
-            synthesizer.envelope.releaseTime = valAsFloat;
+            SetADRTimes();
             break;
     }
 }
