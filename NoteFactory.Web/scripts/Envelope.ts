@@ -40,13 +40,48 @@ class Envelope {
         let env = this._ctx.createGain();
         env.addEventListener("ended", onEnded);
 
+        let effectiveReleaseTime = this._releaseTime;
+        if (effectiveReleaseTime >= durationSeconds) {
+            console.warn("Release time must be less than overall note duration - truncating to 95% of duration");
+            effectiveReleaseTime = durationSeconds * 0.95;
+        }
+
+        //how much time we have for attack, decay, sustain
+        let adsDuration = durationSeconds - effectiveReleaseTime;
+        let attackToLevel = this._attackLevel;
+        let endOfAttack = startTime + this._attackTime;
+        let endOfDecay = endOfAttack + this._decayTime;
+        let releaseAt = startTime + adsDuration;
+        let releaseFromLevel = this._sustainLevel;
+        let skipDecay = false;
+
+        if (this._attackTime > adsDuration) {
+            //we will release in the middle of our attack
+            skipDecay = true;
+            endOfAttack = startTime + adsDuration;
+            //linear scaling of where we'll be at release time
+            attackToLevel = this._attackLevel * (adsDuration / this._attackTime);
+            releaseFromLevel = attackToLevel;
+        } else {
+            if (this._attackTime + this._decayTime > adsDuration) {
+                //we will release in the middle of our decay
+                endOfDecay = startTime + adsDuration;
+                //linear scaling of where we'll be at release time
+                releaseFromLevel = this._attackLevel - ((this._attackLevel - this._sustainLevel) * (adsDuration - this._attackTime) / this._decayTime);
+            }
+        }
+
         env.gain.setValueAtTime(0, startTime);
         //A
-        env.gain.linearRampToValueAtTime(this._attackLevel, startTime + this._attackTime);
-        //D
-        env.gain.linearRampToValueAtTime(this._sustainLevel, startTime + this._attackTime + this._decayTime);
+        env.gain.linearRampToValueAtTime(attackToLevel, endOfAttack);
+
+        if (!skipDecay) {
+            //D
+            env.gain.linearRampToValueAtTime(releaseFromLevel, endOfDecay);
+        }
+
         //S
-        env.gain.setValueAtTime(this._sustainLevel, startTime + (durationSeconds - this._releaseTime));
+        env.gain.setValueAtTime(releaseFromLevel, releaseAt);
         //R
         env.gain.linearRampToValueAtTime(0, startTime + durationSeconds);
 

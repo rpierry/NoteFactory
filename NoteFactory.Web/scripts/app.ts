@@ -9,6 +9,11 @@ const btnToggle: HTMLButtonElement = document.querySelector("#toggle");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
 const rngOct: HTMLInputElement = document.querySelector("#octave");
+const rngAttackLevel: HTMLInputElement = document.querySelector("#attackLevel");
+const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
+const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
+const rngSustainLevel: HTMLInputElement = document.querySelector("#sustainLevel");
+const rngReleaseTime: HTMLInputElement = document.querySelector("#releaseTime");
 
 btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
@@ -16,6 +21,11 @@ btnToggle.addEventListener("click", Toggle);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
 rngOct.addEventListener("change", ChangeOctave, false);
+rngAttackLevel.addEventListener("change", ChangeEnvelope, false);
+rngAttackTime.addEventListener("change", ChangeEnvelope, false);
+rngDecayTime.addEventListener("change", ChangeEnvelope, false);
+rngSustainLevel.addEventListener("change", ChangeEnvelope, false);
+rngReleaseTime.addEventListener("change", ChangeEnvelope, false);
 
 const ctx = new AudioContext();
 
@@ -75,4 +85,25 @@ function Toggle() {
         sequencer.addToStep(0, n);
     }
     incl = !incl;
+}
+
+function ChangeEnvelope(this: HTMLInputElement, ev: Event) {
+    let valAsFloat = parseFloat(this.value);
+    switch (this.id) {
+        case "attackLevel":
+            synthesizer.envelope.attackLevel = valAsFloat;
+            break;
+        case "attackTime":
+            synthesizer.envelope.attackTime = valAsFloat;
+            break;
+        case "decayTime":
+            synthesizer.envelope.decayTime = valAsFloat;
+            break;
+        case "sustainLevel":
+            synthesizer.envelope.sustainLevel = valAsFloat;
+            break;
+        case "releaseTime":
+            synthesizer.envelope.releaseTime = valAsFloat;
+            break;
+    }
 }
