@@ -44,22 +44,33 @@ class Synthesizer {
     }
 
     play(frequency: number, startTime: number, durationSeconds: number) {
-        let osc = this.createOscillator(frequency, this._outputGain);
+        let [ osc, env ] = this.createOscillator(frequency, this._outputGain);
+
         osc.start(startTime);
-        osc.stop(startTime + (durationSeconds * this._releaseAfterPercent));
+        osc.stop(startTime + durationSeconds);
+
+        env.gain.setValueAtTime(0, startTime);
+        env.gain.linearRampToValueAtTime(1, startTime + (durationSeconds * 0.1));
+        env.gain.setValueAtTime(1, startTime + (durationSeconds * 0.8));
+        env.gain.linearRampToValueAtTime(0, startTime + durationSeconds);
     }
 
-    private createOscillator(frequency: number, destination: AudioNode): AudioScheduledSourceNode {
+    private createOscillator(frequency: number, destination: AudioNode): [ osc: AudioScheduledSourceNode, env: GainNode] {
         let osc = this._ctx.createOscillator();
         osc.type = this._oscillatorType;       
         osc.frequency.value = frequency;
         osc.addEventListener("ended", this.oscEnded);
 
-        osc.connect(destination);
-        return osc;
+        let env = this._ctx.createGain();
+        env.addEventListener("ended", this.oscEnded);
+
+        osc.connect(env);
+        env.connect(destination);
+        
+        return [ osc, env ];
     }
 
-    private oscEnded(this: OscillatorNode, ev: Event): any {
+    private oscEnded(this: AudioNode, ev: Event): any {
         this.disconnect();
     }
 }
