@@ -70,6 +70,7 @@ function ChangeVolume() {
 
 function ChangeBpm() {
     sequencer.bpm = parseInt(rngBpm.value);
+    SetADRTimes(); //recalc durations of the envelope
 }
 
 function ChangeOctave() {
