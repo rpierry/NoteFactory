@@ -10,9 +10,11 @@ interface SameAs {
 class Sequencer {
     private readonly _timeSource;
     private readonly _noteHandler;
-    constructor(timeSource: TimeSource, noteHandler: (startTime: number, notes: SameAs[]) => void) {
+    private readonly _onStepChanged;
+    constructor(timeSource: TimeSource, noteHandler: (startTime: number, notes: SameAs[]) => void, onStepChanged: (step: number) => void) {
         this._timeSource = timeSource;
         this._noteHandler = noteHandler;
+        this._onStepChanged = onStepChanged;
         this._pattern = [];
         for (var i = 0; i < this._steps; i++) {
             this._pattern[i] = new Array<SameAs>();
@@ -28,6 +30,7 @@ class Sequencer {
     set steps(stepCount: number) {
         this._steps = stepCount;
         //setup _pattern
+        //setCurrentStep
     }
 
     private _pattern: SameAs[][];
@@ -50,12 +53,18 @@ class Sequencer {
     private readonly _scheduleAheadSeconds = 0.1;
     private _nextStepTime = 0;
     private _currentStep = 0;
+    private setCurrentStep(val: number) {
+        //we set _currentStep in advance of playing the notes for that step, so
+        //we want to notify before updating the value
+        this._onStepChanged(this._currentStep);
+        this._currentStep = val;        
+    }
 
     play() {
         if (this._playing) return;
         this._playing = true;        
 
-        this._currentStep = 0;
+        this.setCurrentStep(0);        
         this._nextStepTime = this._timeSource.currentTime;
         this.scheduleNotes();
     }
@@ -67,7 +76,7 @@ class Sequencer {
             }
 
             this._nextStepTime += this.getSecondsPerBeat();
-            this._currentStep = (this._currentStep + 1) % this._steps;
+            this.setCurrentStep((this._currentStep + 1) % this._steps);
         }
         this._timerId = setTimeout(this.scheduleNotes.bind(this), this._timerCallback);
     }

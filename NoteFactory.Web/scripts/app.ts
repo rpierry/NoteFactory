@@ -14,6 +14,7 @@ const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
 const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
 const rngSustainLevel: HTMLInputElement = document.querySelector("#sustainLevel");
 const rngReleaseTime: HTMLInputElement = document.querySelector("#releaseTime");
+const lblCurrentStep: HTMLLabelElement = document.querySelector("#currentStep");
 
 btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
@@ -29,7 +30,7 @@ rngReleaseTime.addEventListener("change", ChangeEnvelope, false);
 
 const ctx = new AudioContext();
 
-const sequencer = new Sequencer(ctx, ScheduleNotes);
+const sequencer = new Sequencer(ctx, ScheduleNotes, StepChanged);
 sequencer.addToStep(0, new Note(NoteName.A, 4, 1));
 sequencer.addToStep(1, new Note(NoteName.B, 4, 1));
 sequencer.addToStep(2, new Note(NoteName.C, 4, 1));
@@ -62,6 +63,11 @@ function Stop() {
     playing = false;
     
     sequencer.stop();    
+    lblCurrentStep.textContent = '';
+}
+
+function StepChanged(step: number) {
+    lblCurrentStep.textContent = step.toString();
 }
 
 function ChangeVolume() {    
