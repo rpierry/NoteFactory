@@ -3,12 +3,44 @@
 class Synthesizer {
     private _ctx: AudioContext;
     private _outputGain: GainNode;
+    private _connectSubTo: AudioNode;
+    private _connectOscTo: AudioNode;
+    private _connectOsc2To: AudioNode;    
 
     constructor(ctx: AudioContext) {
         this._ctx = ctx;
-        this._outputGain = this._ctx.createGain();
-        this._outputGain.connect(this._ctx.destination);
         this.envelope = new Envelope(this._ctx);
+
+        let oscPan = this._ctx.createStereoPanner();
+        oscPan.pan.value = this._split;
+        this._connectOscTo = oscPan;
+
+        let osc2Pan = this._ctx.createStereoPanner();
+        osc2Pan.pan.value = -this._split;
+        this._connectOsc2To = osc2Pan;      
+
+        let oscGain = this._ctx.createGain();
+        oscGain.gain.value = this._oscBalance;        
+        oscPan.connect(oscGain);
+
+        let osc2Gain = this._ctx.createGain();
+        osc2Gain.gain.value = 1.0 - this._oscBalance;        
+        osc2Pan.connect(osc2Gain);
+
+        let subMix = this._ctx.createGain();
+        subMix.gain.value = this._subLevel;
+        this._connectSubTo = subMix;        
+
+        let mainMix = this._ctx.createGain();
+        mainMix.gain.value = 1 - this._subLevel;        
+
+        oscGain.connect(mainMix);
+        osc2Gain.connect(mainMix);
+
+        this._outputGain = this._ctx.createGain();
+        subMix.connect(this._outputGain);
+        mainMix.connect(this._outputGain);
+        this._outputGain.connect(this._ctx.destination);        
     }
 
     private throwIfNotPercentage(name: string, val: number) {
@@ -37,13 +69,11 @@ class Synthesizer {
     readonly envelope: Envelope;
 
     play(frequency: number, startTime: number, durationSeconds: number) {
-        let [endOfChain, oscs] = this.createOscillators(frequency);
-        
-        let env = this.envelope.createAtTime(startTime, durationSeconds, this.disconnectNode);
-        endOfChain.connect(env);
-        env.connect(this._outputGain);        
-
-        for (var o of oscs) {
+        let [toSchedule] =
+            this.createOscillators(frequency,
+                () => this.envelope.createAtTime(startTime, durationSeconds, this.disconnectNode));
+                
+        for (var o of toSchedule) {
             o.start(startTime);
             o.stop(startTime + durationSeconds);
         }
@@ -55,63 +85,34 @@ class Synthesizer {
     private _secondDetune = 8;
     private _oscBalance = 0.5;
 
-    private createOscillators(frequency: number): [ endOfChain: AudioNode, toSchedule: AudioScheduledSourceNode[]] {
+    private createOscillators(frequency: number, getEnvelope: () => AudioNode): [ toSchedule: AudioScheduledSourceNode[]] {
         let osc = this._ctx.createOscillator();
         osc.type = this._oscillatorType;       
         osc.frequency.value = frequency;
         osc.addEventListener("ended", this.disconnectNode);
+        let oscEnv = getEnvelope();
+        osc.connect(oscEnv);
+        oscEnv.connect(this._connectOscTo);
 
         let osc2 = this._ctx.createOscillator();
         osc2.type = this._oscillatorType;
         osc2.frequency.value = frequency;
         osc2.detune.value = this._secondDetune;
         osc2.addEventListener("ended", this.disconnectNode);
-
-        let oscPan = this._ctx.createStereoPanner();
-        oscPan.pan.value = this._split;
-        oscPan.addEventListener("ended", this.disconnectNode);
-        osc.connect(oscPan);
-
-        let osc2Pan = this._ctx.createStereoPanner();
-        osc2Pan.pan.value = -this._split;
-        osc2Pan.addEventListener("ended", this.disconnectNode);
-        osc2.connect(osc2Pan);
-
-        let oscGain = this._ctx.createGain();
-        oscGain.gain.value = this._oscBalance;
-        oscGain.addEventListener("ended", this.disconnectNode);
-        oscPan.connect(oscGain);
-
-        let osc2Gain = this._ctx.createGain();
-        osc2Gain.gain.value = 1.0 - this._oscBalance;
-        osc2Gain.addEventListener("ended", this.disconnectNode);
-        osc2Pan.connect(osc2Gain);
+        let osc2Env = getEnvelope();
+        osc2.connect(osc2Env);
+        osc2Env.connect(this._connectOsc2To);
 
         let sub = this._ctx.createOscillator();
         sub.type = "sine";
         sub.frequency.value = frequency / 2;
         sub.detune.value = this._subDetune;
         sub.addEventListener("ended", this.disconnectNode);
+        let subEnv = getEnvelope();
+        sub.connect(subEnv);
+        subEnv.connect(this._connectSubTo);
         
-        let subMix = this._ctx.createGain();
-        subMix.gain.value = this._subLevel;
-        subMix.addEventListener("ended", this.disconnectNode);
-        sub.connect(subMix);
-
-        let mainMix = this._ctx.createGain();
-        mainMix.gain.value = 1 - this._subLevel;
-        mainMix.addEventListener("ended", this.disconnectNode);
-
-        oscGain.connect(mainMix);
-        osc2Gain.connect(mainMix);
-
-        let output = this._ctx.createGain();
-        output.gain.value = 1;
-        output.addEventListener("ended", this.disconnectNode);
-        subMix.connect(output);
-        mainMix.connect(output);
-        
-        return [ output, [ osc, osc2, sub ]];
+        return [[ osc, osc2, sub ]];
     }
 
     private disconnectNode(this: AudioNode, ev: Event): any {
