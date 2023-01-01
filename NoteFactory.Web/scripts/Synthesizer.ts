@@ -1,4 +1,5 @@
-﻿
+﻿import { Envelope } from "./Envelope.js";
+
 class Synthesizer {
     private _ctx: AudioContext;
     private _outputGain: GainNode;
@@ -7,6 +8,7 @@ class Synthesizer {
         this._ctx = ctx;
         this._outputGain = this._ctx.createGain();
         this._outputGain.connect(this._ctx.destination);
+        this.envelope = new Envelope(this._ctx);
     }
 
     private throwIfNotPercentage(name: string, val: number) {
@@ -32,45 +34,29 @@ class Synthesizer {
         this._oscillatorType = val;
     }
 
-    private _releaseAfterPercent: number = 0.9;
-    get releaseAfterPercent() {
-        return this._releaseAfterPercent;
-    }
-
-    set releaseAfterPercent(val: number) {
-        this.throwIfNotPercentage("releaseAfterPercent", val);
-
-        this._releaseAfterPercent = val;
-    }
+    readonly envelope: Envelope;
 
     play(frequency: number, startTime: number, durationSeconds: number) {
-        let [ osc, env ] = this.createOscillator(frequency, this._outputGain);
+        let osc = this.createOscillator(frequency);
 
         osc.start(startTime);
         osc.stop(startTime + durationSeconds);
 
-        env.gain.setValueAtTime(0, startTime);
-        env.gain.linearRampToValueAtTime(1, startTime + (durationSeconds * 0.1));
-        env.gain.setValueAtTime(1, startTime + (durationSeconds * 0.8));
-        env.gain.linearRampToValueAtTime(0, startTime + durationSeconds);
+        let env = this.envelope.createAtTime(startTime, durationSeconds, this.disconnectNode);
+        osc.connect(env);
+        env.connect(this._outputGain);        
     }
 
-    private createOscillator(frequency: number, destination: AudioNode): [ osc: AudioScheduledSourceNode, env: GainNode] {
+    private createOscillator(frequency: number): AudioScheduledSourceNode {
         let osc = this._ctx.createOscillator();
         osc.type = this._oscillatorType;       
         osc.frequency.value = frequency;
-        osc.addEventListener("ended", this.oscEnded);
-
-        let env = this._ctx.createGain();
-        env.addEventListener("ended", this.oscEnded);
-
-        osc.connect(env);
-        env.connect(destination);
+        osc.addEventListener("ended", this.disconnectNode);
         
-        return [ osc, env ];
+        return osc;
     }
 
-    private oscEnded(this: AudioNode, ev: Event): any {
+    private disconnectNode(this: AudioNode, ev: Event): any {
         this.disconnect();
     }
 }
