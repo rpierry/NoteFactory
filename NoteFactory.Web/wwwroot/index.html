@@ -5,7 +5,7 @@
     <title>Note Factory</title>
     <script type="module" src="js/app.js" defer></script>
 
-    <style>
+    <style>        
         .step {
             background-color: lightblue;
         }
@@ -14,8 +14,17 @@
             background-color: lightgreen;            
         }
 
-        .note {
-            /* background-color: lightgrey; */
+        .note {                      
+        }
+
+        tr[data-note $= '5'] td.note {
+            /*filter: saturate(150%);*/
+            backdrop-filter: saturate(175%);
+        }
+        
+        tr[data-note $= '3'] td.note {
+            /*filter: saturate(65%);*/
+            backdrop-filter: saturate(55%);
         }
 
         .note.selected {
@@ -31,7 +40,7 @@
 
         .noteGrid th {
             background-color: white;
-        }
+        }        
     </style>
 </head>
 <body>
