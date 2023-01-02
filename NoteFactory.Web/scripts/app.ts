@@ -187,12 +187,13 @@ function ChangeSteps() {
 
         for (var i = 0; i < toAddCount; i++) {
             let newStepId = (oldCount + i).toString();
+            let newStepLabel = (oldCount + i + 1).toString();
             let newCol = cloneCol.cloneNode(true) as HTMLTableColElement;
             newCol.dataset['stepid'] = newStepId;
             colGroup.appendChild(newCol);
 
             let newTh = aTh.cloneNode(true) as HTMLTableCellElement;
-            newTh.innerText = newStepId;
+            newTh.innerText = newStepLabel;
             firstRow.appendChild(newTh);
 
             for (var j = 0; j < dataRows.length; j++) {
