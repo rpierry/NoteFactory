@@ -6,10 +6,13 @@ import { Synthesizer } from "./Synthesizer.js";
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
+const outVol: HTMLOutputElement = document.querySelector("#volString");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
+const outBpm: HTMLOutputElement = document.querySelector("#bpmString");
 const selNoteLength: HTMLSelectElement = document.querySelector("#noteLength");
 const rngOct: HTMLInputElement = document.querySelector("#octave");
 const rngSteps: HTMLInputElement = document.querySelector("#steps");
+const outSteps: HTMLOutputElement = document.querySelector("#stepsString");
 const rngAttackLevel: HTMLInputElement = document.querySelector("#attackLevel");
 const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
 const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
@@ -74,11 +77,14 @@ function StepChanged(step: number) {
 
 function ChangeVolume() {    
     synthesizer.gain = parseFloat(rngVol.value);
+    outVol.value = Math.round(parseFloat(rngVol.value) * 100).toString();
 }
 
 function ChangeBpm() {
     sequencer.bpm = parseInt(rngBpm.value);
     SetADRTimes(); //recalc durations of the envelope
+
+    outBpm.value = rngBpm.value;
 }
 
 function ChangeNoteLength() {
@@ -214,4 +220,6 @@ function ChangeSteps() {
     //clear selected notes / columns and repopulate from sequencer
     tblGrid.querySelectorAll('td.note').forEach((e) => e.classList.remove('selected'));
     sequencer.forEachNote((step: number, n: Note) => SelectNote(tblGrid, step, n));
+
+    outSteps.value = rngSteps.value;
 }
