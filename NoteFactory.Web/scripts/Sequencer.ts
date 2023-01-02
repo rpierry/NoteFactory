@@ -30,7 +30,17 @@ class Sequencer {
     set steps(stepCount: number) {
         this._steps = stepCount;
         //setup _pattern
-        //setCurrentStep
+        let newPattern: SameAs[][] = [];
+        //save what we can from the old pattern
+        for (var i = 0; i < Math.min(this._pattern.length, stepCount); i++) {
+            newPattern[i] = this._pattern[i];
+        }
+        for (var i = Math.min(this._pattern.length, stepCount); i < stepCount; i++) {
+            newPattern[i] = new Array<SameAs>();
+        }
+        this._pattern = newPattern;
+        
+        this.setCurrentStep(this._currentStep % this._steps);
     }
 
     private _pattern: SameAs[][];
@@ -111,6 +121,14 @@ class Sequencer {
         let i = this.contains(this._pattern[step], note);
         if (i != -1) {
             this._pattern[step].splice(i, 1);
+        }
+    }
+
+    forEachNote(fn: (step: number, note: SameAs) => void) {
+        for (var i = 0; i < this._pattern.length; i++) {
+            for (var j = 0; j < this._pattern[i].length; j++) {
+                fn(i, this._pattern[i][j]);
+            }
         }
     }
 

@@ -8,6 +8,7 @@ const btnStop: HTMLButtonElement = document.querySelector("#stop");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
 const rngOct: HTMLInputElement = document.querySelector("#octave");
+const rngSteps: HTMLInputElement = document.querySelector("#steps");
 const rngAttackLevel: HTMLInputElement = document.querySelector("#attackLevel");
 const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
 const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
@@ -20,6 +21,7 @@ btnStop.addEventListener("click", Stop);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
 rngOct.addEventListener("change", ChangeOctave, false);
+rngSteps.addEventListener("change", ChangeSteps, false);
 rngAttackLevel.addEventListener("change", ChangeEnvelope, false);
 rngAttackTime.addEventListener("change", ChangeEnvelope, false);
 rngDecayTime.addEventListener("change", ChangeEnvelope, false);
@@ -136,4 +138,49 @@ function GridNoteClicked(this: Element, ev: Event) {
         sequencer.addToStep(step, note);
         td.classList.add('selected');
     }
+}
+
+function SelectNote(grid: HTMLTableElement, step: number, n: Note) {
+    let dataLabel = Note.getNoteNameKeyForValue(n.noteName) + n.octave.toString();
+    let row = grid.querySelector('tr[data-note="' + dataLabel + '"]');
+    let tds = row.querySelectorAll('td.note');
+    tds[step].classList.add('selected');
+}
+
+function ChangeSteps() {
+    let oldCount = sequencer.steps;
+    let newCount = parseInt(rngSteps.value);
+    sequencer.steps = newCount;
+
+    //setup table markup
+    // col in colgroup
+    // th in first row
+    // td in every row with a data-note
+    let colGroup = tblGrid.querySelector('colgroup');
+    let firstRow = tblGrid.querySelector('tr');
+    let dataRows = tblGrid.querySelectorAll('tr[data-note]');
+
+    if (newCount < oldCount) {
+        let toRemoveCount = oldCount - newCount;
+        let cols = colGroup.querySelectorAll('col.step');
+        let ths = firstRow.querySelectorAll('th');
+
+        for (var i = 0; i < toRemoveCount; i++) {
+            //length of cols and ths remains at oldCount
+            //array isn't updated after we remove since we
+            //dont requery
+            cols[cols.length - 1 - i].remove();
+            ths[ths.length - 1 - i].remove();
+            for (var j = 0; j < dataRows.length; j++) {
+                let tds = dataRows[j].querySelectorAll('td');
+                tds[tds.length - 1].remove();
+            }
+        }
+    } else {
+
+    }
+
+    //clear selected notes / columns and repopulate from sequencer
+    tblGrid.querySelectorAll('td.note').forEach((e) => e.classList.remove('selected'));
+    sequencer.forEachNote((step: number, n: Note) => SelectNote(tblGrid, step, n));
 }

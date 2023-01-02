@@ -15,7 +15,8 @@ const NoteNames = {
     B:  493.88
 } as const;
 
-type NoteName = typeof NoteNames[keyof typeof NoteNames];
+type NoteNameKeys = keyof typeof NoteNames;
+type NoteName = typeof NoteNames[NoteNameKeys];
 
 type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -41,6 +42,9 @@ class Note implements SameAs {
                 this.noteName / (2 << (4 - this.octave - 1));
     }
 
+    static getNoteNameKeyForValue(nn: NoteName): NoteNameKeys {
+        return (Object.keys(NoteNames) as NoteNameKeys[]).find((k) => NoteNames[k] == nn);
+    }
 }
 
 export { Note, NoteNames, NoteName, Octave };
