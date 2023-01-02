@@ -11,8 +11,7 @@
         }
 
         .step.active {
-            background-color: lightgreen;
-            /* border-color: lightgreen; */
+            background-color: lightgreen;            
         }
 
         .note {
@@ -21,6 +20,17 @@
 
         .note.selected {
             background-color: lightsalmon;
+        }
+        
+        .noteGrid th,
+        .noteGrid td {
+            min-width: 30px;
+            min-height: 30px;
+            aspect-ratio: 1;            
+        }
+
+        .noteGrid th {
+            background-color: white;
         }
     </style>
 </head>
@@ -48,7 +58,7 @@
     <section>
         <h1>Note Grid</h1>
 
-        <table id="noteGrid">
+        <table id="noteGrid" class="noteGrid">
             <caption>Sequencer Grid</caption>
             <colgroup>
                 <col />
