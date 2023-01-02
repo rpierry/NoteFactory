@@ -1,14 +1,16 @@
 ﻿import { SameAs } from "./Sequencer.js";
 
-enum NoteName {
-    C = 261.63,
-    D = 293.67,
-    E = 329.63,
-    F = 349.23,
-    G = 392,
-    A = 440,
-    B = 493.88
-}
+const NoteNames = {
+    C: 261.63,
+    D: 293.67,
+    E: 329.63,
+    F: 349.23,
+    G: 392,
+    A: 440,
+    B: 493.88
+} as const;
+
+type NoteName = typeof NoteNames[keyof typeof NoteNames];
 
 type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -24,7 +26,7 @@ class Note implements SameAs {
     }
 
     readonly beatDuration: number = 1;
-    readonly noteName: NoteName = NoteName.A;
+    readonly noteName: NoteName = NoteNames.A;
     readonly octave: Octave = 4;
 
     getFrequency() {
@@ -36,4 +38,4 @@ class Note implements SameAs {
 
 }
 
-export { Note, NoteName, Octave };
+export { Note, NoteNames, NoteName, Octave };

@@ -1,11 +1,10 @@
 ﻿
-import { Sequencer, TimeSource } from "./Sequencer.js";
-import { Note, NoteName, Octave } from "./Note.js";
+import { Sequencer } from "./Sequencer.js";
+import { Note, NoteNames, Octave } from "./Note.js";
 import { Synthesizer } from "./Synthesizer.js";
 
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");
-const btnToggle: HTMLButtonElement = document.querySelector("#toggle");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
 const rngOct: HTMLInputElement = document.querySelector("#octave");
@@ -14,11 +13,10 @@ const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
 const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
 const rngSustainLevel: HTMLInputElement = document.querySelector("#sustainLevel");
 const rngReleaseTime: HTMLInputElement = document.querySelector("#releaseTime");
-const lblCurrentStep: HTMLLabelElement = document.querySelector("#currentStep");
+const tblGrid: HTMLTableElement = document.querySelector("#noteGrid");
 
 btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
-btnToggle.addEventListener("click", Toggle);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
 rngOct.addEventListener("change", ChangeOctave, false);
@@ -28,17 +26,11 @@ rngDecayTime.addEventListener("change", ChangeEnvelope, false);
 rngSustainLevel.addEventListener("change", ChangeEnvelope, false);
 rngReleaseTime.addEventListener("change", ChangeEnvelope, false);
 
+tblGrid.querySelectorAll("td.note").forEach(e => e.addEventListener("click", GridNoteClicked));
+
 const ctx = new AudioContext();
 
 const sequencer = new Sequencer(ctx, ScheduleNotes, StepChanged);
-sequencer.addToStep(0, new Note(NoteName.A, 4, 1));
-sequencer.addToStep(1, new Note(NoteName.B, 4, 1));
-sequencer.addToStep(2, new Note(NoteName.C, 4, 1));
-sequencer.addToStep(3, new Note(NoteName.D, 4, 1));
-sequencer.addToStep(4, new Note(NoteName.E, 4, 1));
-sequencer.addToStep(5, new Note(NoteName.F, 4, 1));
-sequencer.addToStep(6, new Note(NoteName.G, 4, 1));
-
 const synthesizer = new Synthesizer(ctx);
 ChangeVolume();
 SetADRTimes();
@@ -48,6 +40,7 @@ let playing = false;
 function Play() {
     if (playing) return;
     playing = true;
+    if (ctx.state == "suspended") ctx.resume();
 
     sequencer.play();
 }
@@ -58,16 +51,21 @@ function ScheduleNotes(startTime: number, notes: Note[]) {
     }
 }
 
+function ClearActiveStep() {
+    tblGrid.querySelectorAll("col.step").forEach((e) => e.classList.remove("active"));
+}
+
 function Stop() {
     if (!playing) return;
     playing = false;
     
-    sequencer.stop();    
-    lblCurrentStep.textContent = '';
+    sequencer.stop();        
+    ClearActiveStep();
 }
 
 function StepChanged(step: number) {
-    lblCurrentStep.textContent = step.toString();
+    ClearActiveStep();
+    tblGrid.querySelector("col[data-stepid = '" + step + "']").classList.add("active");
 }
 
 function ChangeVolume() {    
@@ -82,17 +80,6 @@ function ChangeBpm() {
 function ChangeOctave() {
     sequencer.mapNotes(
         (n: Note) => new Note(n.noteName, parseInt(rngOct.value) as Octave, n.beatDuration));
-}
-
-let incl = false;
-let n = new Note(NoteName.C, 4, 1);
-function Toggle() {
-    if (incl) {
-        sequencer.removeFromStep(0, n);
-    } else {
-        sequencer.addToStep(0, n);
-    }
-    incl = !incl;
 }
 
 function SetADRTimes() {
@@ -126,5 +113,27 @@ function ChangeEnvelope(this: HTMLInputElement, ev: Event) {
         case "releaseTime":
             SetADRTimes();
             break;
+    }
+}
+
+function GridNoteClicked(this: Element, ev: Event) {    
+    //find col and row
+    let td = this as HTMLTableCellElement;
+    let tr = td.parentElement as HTMLTableRowElement;
+    let noteAttr = tr.dataset['note'];
+    let noteName = noteAttr.substring(0, noteAttr.length - 1);
+    let noteNameKey = noteName as keyof typeof NoteNames;
+    let octave = parseInt(noteAttr.substring(noteAttr.length - 1));
+    let octaveKey = octave as Octave;
+    let note = new Note(NoteNames[noteNameKey], octaveKey, 1);
+
+    let step = td.cellIndex - 1; //account for the th
+
+    if (td.classList.contains('selected')) {
+        sequencer.removeFromStep(step, note);
+        td.classList.remove('selected');
+    } else {
+        sequencer.addToStep(step, note);
+        td.classList.add('selected');
     }
 }

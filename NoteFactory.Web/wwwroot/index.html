@@ -4,6 +4,25 @@
     <meta charset="utf-8" />
     <title>Note Factory</title>
     <script type="module" src="js/app.js" defer></script>
+
+    <style>
+        .step {
+            background-color: lightblue;
+        }
+
+        .step.active {
+            background-color: lightgreen;
+            /* border-color: lightgreen; */
+        }
+
+        .note {
+            /* background-color: lightgrey; */
+        }
+
+        .note.selected {
+            background-color: lightsalmon;
+        }
+    </style>
 </head>
 <body>
     <section>
@@ -21,11 +40,115 @@
         <label for="releaseTime">Release Time</label><input type="range" value="0.3" min="0" max="1" step="0.01" name="releaseTime" id="releaseTime" /> <br />
     </section>
     <section>
-        <h1>Actions</h1>
-        <label for="currentStep">Current Step: </label><label name="currentStep" id="currentStep"></label><br />
+        <h1>Actions</h1>        
         <button type="button" id="play">Play</button>
-        <button type="button" id="stop">Stop</button>
-        <button type="button" id="toggle">Toggle Note</button>            
+        <button type="button" id="stop">Stop</button>                  
+    </section>
+    <section>
+        <h1>Note Grid</h1>
+
+        <table id="noteGrid">
+            <caption>Sequencer Grid</caption>
+            <colgroup>
+                <col />
+                <col class="step" data-stepid="0" />
+                <col class="step" data-stepid="1" />
+                <col class="step" data-stepid="2" />
+                <col class="step" data-stepid="3" />
+                <col class="step" data-stepid="4" />
+                <col class="step" data-stepid="5" />
+                <col class="step" data-stepid="6" />
+                <col class="step" data-stepid="7" />
+            </colgroup>
+            <tr>
+                <th />
+                <th scope="col">0</th>
+                <th scope="col">1</th>
+                <th scope="col">2</th>
+                <th scope="col">3</th>
+                <th scope="col">4</th>
+                <th scope="col">5</th>
+                <th scope="col">6</th>
+                <th scope="col">7</th>
+            </tr>
+            <tr data-note="B4">
+                <th scope="row">B</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+            <tr data-note="A4">
+                <th scope="row">A</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+            <tr data-note="G4">
+                <th scope="row">G</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+            <tr data-note="F4">
+                <th scope="row">F</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+            <tr data-note="E4">
+                <th scope="row">E</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+            <tr data-note="D4">
+                <th scope="row">D</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+            <tr data-note="C4">
+                <th scope="row">C</th>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+                <td class="note"></td>
+            </tr>
+        </table>
     </section>
 </body>
 </html>
