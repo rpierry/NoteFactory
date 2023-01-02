@@ -177,7 +177,30 @@ function ChangeSteps() {
             }
         }
     } else {
+        let toAddCount = newCount - oldCount;
+        let aCol = colGroup.querySelector('col.step');
+        let cloneCol = aCol.cloneNode(true) as Element;
+        cloneCol.classList.remove('active');
 
+        let aTh = firstRow.querySelector('th[scope]');
+        let aTd = dataRows[0].querySelector('td.note');
+
+        for (var i = 0; i < toAddCount; i++) {
+            let newStepId = (oldCount + i).toString();
+            let newCol = cloneCol.cloneNode(true) as HTMLTableColElement;
+            newCol.dataset['stepid'] = newStepId;
+            colGroup.appendChild(newCol);
+
+            let newTh = aTh.cloneNode(true) as HTMLTableCellElement;
+            newTh.innerText = newStepId;
+            firstRow.appendChild(newTh);
+
+            for (var j = 0; j < dataRows.length; j++) {
+                let newTd = aTd.cloneNode(true);                
+                newTd.addEventListener("click", GridNoteClicked);
+                dataRows[j].appendChild(newTd);
+            }
+        }
     }
 
     //clear selected notes / columns and repopulate from sequencer
