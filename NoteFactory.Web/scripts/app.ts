@@ -1,5 +1,5 @@
 ﻿
-import { Sequencer } from "./Sequencer.js";
+import { NoteLength, Sequencer } from "./Sequencer.js";
 import { Note, NoteNames, Octave } from "./Note.js";
 import { Synthesizer } from "./Synthesizer.js";
 
@@ -7,6 +7,7 @@ const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
+const selNoteLength: HTMLSelectElement = document.querySelector("#noteLength");
 const rngOct: HTMLInputElement = document.querySelector("#octave");
 const rngSteps: HTMLInputElement = document.querySelector("#steps");
 const rngAttackLevel: HTMLInputElement = document.querySelector("#attackLevel");
@@ -20,6 +21,7 @@ btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
+selNoteLength.addEventListener("change", ChangeNoteLength, false);
 rngOct.addEventListener("change", ChangeOctave, false);
 rngSteps.addEventListener("change", ChangeSteps, false);
 rngAttackLevel.addEventListener("change", ChangeEnvelope, false);
@@ -77,6 +79,11 @@ function ChangeVolume() {
 function ChangeBpm() {
     sequencer.bpm = parseInt(rngBpm.value);
     SetADRTimes(); //recalc durations of the envelope
+}
+
+function ChangeNoteLength() {
+    sequencer.noteLength = selNoteLength.value as NoteLength;
+    SetADRTimes(); //recalc env durations
 }
 
 function ChangeOctave() {

@@ -39,6 +39,13 @@
         <h1>Parameters</h1>
         <label for="vol">Volume</label><input type="range" value="0.5" min="0" max="1" step="0.05" name="vol" id="vol" /> <br />
         <label for="bpm">BPM</label><input type="range" value="120" min="40" max="200" step="1" name="bpm" id="bpm" /> <br />
+        <label for="noteLength">Note Length</label>
+        <select id="noteLength" name="noteLength">
+            <option selected value="quarter">1/4</option>
+            <option value="eighth">1/8</option>
+            <option value="sixteenth">1/16</option>
+            <option value="triplet">triplet 1/8</option>
+        </select><br />
         <label for="octave">Octave</label><input type="range" value="4" min="0" max="7" step="1" name="octave" id="octave" /> <br />
         <label for="steps">Steps</label><input type="range" value="8" min="4" max="32" step="1" name="steps" id="steps" /> <br />
     </section>

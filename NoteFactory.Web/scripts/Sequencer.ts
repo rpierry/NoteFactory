@@ -7,6 +7,8 @@ interface SameAs {
     sameAs(other: SameAs): boolean;
 }
 
+type NoteLength = "quarter" | "eighth" | "sixteenth" | "triplet";
+
 class Sequencer {
     private readonly _timeSource;
     private readonly _noteHandler;
@@ -46,15 +48,24 @@ class Sequencer {
     private _pattern: SameAs[][];
 
     private _bpm: number = 120;
-    get bpm() {
-        return this._bpm;
-    }
-    set bpm(beatsPerMin: number) {
-        this._bpm = beatsPerMin;
+    get bpm() { return this._bpm; }
+    set bpm(beatsPerMin: number) { this._bpm = beatsPerMin; }
+
+    private _noteLength: NoteLength = "quarter";
+    get noteLength() { return this._noteLength; }
+    set noteLength(noteLength: NoteLength) { this._noteLength = noteLength; }
+
+    private noteLengthMultiplier(l: NoteLength) {
+        switch (l) {
+            case "quarter": return 1;
+            case "eighth": return 2;
+            case "sixteenth": return 4;
+            case "triplet": return 3;
+        }        
     }
 
     getSecondsPerBeat() {
-        return 60 / this._bpm; 
+        return 60 / (this._bpm * this.noteLengthMultiplier(this._noteLength)); 
     }
 
     private _playing = false;
@@ -143,4 +154,4 @@ class Sequencer {
     }
 }
 
-export { Sequencer, TimeSource, SameAs };
+export { Sequencer, TimeSource, SameAs, NoteLength };
