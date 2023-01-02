@@ -11,6 +11,7 @@ const rngBpm: HTMLInputElement = document.querySelector("#bpm");
 const outBpm: HTMLOutputElement = document.querySelector("#bpmString");
 const selNoteLength: HTMLSelectElement = document.querySelector("#noteLength");
 const rngOct: HTMLInputElement = document.querySelector("#octave");
+const outOct: HTMLOutputElement = document.querySelector("#octaveString");
 const rngSteps: HTMLInputElement = document.querySelector("#steps");
 const outSteps: HTMLOutputElement = document.querySelector("#stepsString");
 const rngAttackLevel: HTMLInputElement = document.querySelector("#attackLevel");
@@ -52,9 +53,21 @@ function Play() {
     sequencer.play();
 }
 
-function ScheduleNotes(startTime: number, notes: Note[]) {
+function OctaveModifierToMultiplier(octaveDelta: number) {
+    switch (octaveDelta) {
+        case -2: return 0.25;
+        case -1: return 0.5;
+        case 0: return 1;
+        case 1: return 2;
+        case 2: return 4;
+    }
+    return 1;
+}
+
+function ScheduleNotes(startTime: number, notes: Note[]) {    
+    let freqMult = OctaveModifierToMultiplier(parseInt(rngOct.value));
     for (let n of notes) {
-        synthesizer.play(n.getFrequency(), startTime, n.beatDuration * sequencer.getSecondsPerBeat());        
+        synthesizer.play(n.getFrequency() * freqMult, startTime, n.beatDuration * sequencer.getSecondsPerBeat());
     }
 }
 
@@ -93,8 +106,10 @@ function ChangeNoteLength() {
 }
 
 function ChangeOctave() {
-    sequencer.mapNotes(
-        (n: Note) => new Note(n.noteName, parseInt(rngOct.value) as Octave, n.beatDuration));
+    outOct.value = rngOct.value;
+
+    //sequencer.mapNotes(
+    //    (n: Note) => new Note(n.noteName, parseInt(rngOct.value) as Octave, n.beatDuration));
 }
 
 function SetADRTimes() {
