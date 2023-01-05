@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Note Factory</title>
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
     <script type="module" src="js/app.js" defer></script>
 
     <style>
@@ -40,18 +41,18 @@
             background-color: lightblue;
         }
 
-        .step.active {
-            background-color: lightgreen;            
-        }
+            .step.active {
+                background-color: lightgreen;
+            }
 
-        .note {                      
+        .note {
         }
 
         tr[data-note $= '5'] td.note {
             /*filter: saturate(150%);*/
             backdrop-filter: saturate(175%);
         }
-        
+
         tr[data-note $= '3'] td.note {
             /*filter: saturate(65%);*/
             backdrop-filter: saturate(55%);
@@ -60,17 +61,17 @@
         .note.selected {
             background-color: lightsalmon;
         }
-        
+
         .noteGrid th,
         .noteGrid td {
             min-width: 30px;
             min-height: 30px;
-            aspect-ratio: 1;            
+            aspect-ratio: 1;
         }
 
         .noteGrid th {
             background-color: white;
-        }        
+        }
     </style>
 </head>
 <body class="mainContainer">
@@ -103,7 +104,9 @@
     </section>
     <section id="remoteSection">
         <h1>Shared Session</h1>
-        <button type="button" id="connect">Connect</button>
+        <article id="remoteContent">
+            <button type="button" id="connect" hx-get="/createSession" hx-target="#remoteContent">Connect</button>
+        </article>
     </section>
     <section id="gridSection">
         <h1>Note Grid</h1>
