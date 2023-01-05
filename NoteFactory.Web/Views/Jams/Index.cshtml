@@ -1,0 +1,9 @@
+﻿@using NoteFactory.Web.Controllers;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@* note that this should match what sits in /index.html *@
+<button type="button" id="connect" hx-post="@Url.Action(nameof(JamsController.Create))" hx-target="#remoteContent">Connect</button>

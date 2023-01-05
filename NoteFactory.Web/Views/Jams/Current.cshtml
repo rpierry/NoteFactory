@@ -1,0 +1,15 @@
+﻿@using NoteFactory.Web.Controllers;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h1>Hello from the server</h1>
+You are collaborating in session @Model.id
+<ol>
+    <li>One item</li>
+    <li>Another item</li>
+</ol>
+
+<button type="button" id="disconnect" hx-post="@Url.Action(nameof(JamsController.Disconnect), new { Model.id } )" hx-target="#remoteContent">Disconnect</button>
