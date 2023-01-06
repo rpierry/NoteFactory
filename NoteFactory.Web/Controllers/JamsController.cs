@@ -40,6 +40,16 @@ namespace NoteFactory.Web.Controllers
             return RedirectToAction(nameof(Current), new { id, participantId = p.Id });
         }
 
+        public IActionResult Connect(string jamId, string participantName)
+        {
+            var c = _chatManager.GetChat(jamId);
+            if (c == null) return NotFound();
+
+            var p = c.AddParticipant(participantName);
+
+            return RedirectToAction(nameof(Current), new { id = c.Id, participantId = p.Id });
+        }
+
         public IActionResult Current(string id, int participantId)
         {            
             return View(new { id, participantId });

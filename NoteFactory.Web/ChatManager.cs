@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace NoteFactory.Web
 {
@@ -25,29 +26,32 @@ namespace NoteFactory.Web
     public class Message
     {
         Func<int, string> _nameResolver;
-        public Message(DateTime sentAt, int sentBy, Func<int,string> nameResolver, string text)
+        public Message(DateTime sentAt, int sentBy, string sentByName, string text)
         {
             SentAt = sentAt;
             SentBy = sentBy;
-            _nameResolver = nameResolver;
+            SentByName = sentByName;
             Text = text;
         }
 
         public DateTime SentAt { get; private set; }
         public int SentBy { get; private set; }
 
-        public string SentByName { get { return _nameResolver(SentBy); } }
+        public string SentByName { get; private set; }
         public string Text { get; private set; }
     }
 
     public class Chat
     {
+        const int SystemId = 0;
         public Chat(string id)
         {
             Id = id;
             _participants = new List<Participant>();
             _messages = new List<Message>();
             LastUpdated = DateTime.Now;
+
+            _participants.Add(new Participant(SystemId, "System"));
         }
 
         public string Id { get; private set; }
@@ -58,13 +62,13 @@ namespace NoteFactory.Web
 
         public DateTime LastUpdated { get; private set; }
 
-        public bool IsEmpty { get { return _participants.Count == 0; } }
+        public bool IsEmpty { get { return _participants.Count == 1; } }
 
         public void AppendMessage(int sentBy, string text)
         {
             var m = 
                 new Message(DateTime.Now, sentBy, 
-                    i => Participants.FirstOrDefault(p => p.Id == i)?.Name ?? i.ToString(),
+                    Participants.FirstOrDefault(p => p.Id == sentBy)?.Name ?? sentBy.ToString(),
                     text);
             _messages.Add(m);
             LastUpdated = m.SentAt;
@@ -75,13 +79,20 @@ namespace NoteFactory.Web
         {
             var p = new Participant(_participantId++, name);
             _participants.Add(p);
+
+            AppendMessage(SystemId, $"{name} joined the chat");
+
             return p;
         }
 
         public void RemoveParticipant(int id) 
         { 
             var p = _participants.SingleOrDefault(p => p.Id == id);
-            if (p != null) _participants.Remove(p);
+            if (p != null)
+            {
+                _participants.Remove(p);
+                AppendMessage(SystemId, $"{p.Name} left the chat");
+            }
         }
 
         public IEnumerable<Message> MessagesSince(DateTime sentAt) 

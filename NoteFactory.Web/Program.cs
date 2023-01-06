@@ -78,4 +78,14 @@ app.MapControllerRoute(
     },
     new { httpMethod = new HttpMethodRouteConstraint(HttpMethods.Post) });
 
+app.MapControllerRoute(
+    "jams",
+    "Jams/Connect",
+    new
+    {
+        controller = "Jams",
+        action = "Connect"
+    },
+    new { httpMethod = new HttpMethodRouteConstraint(HttpMethods.Post) });
+
 app.Run();
