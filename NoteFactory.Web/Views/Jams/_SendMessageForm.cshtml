@@ -1,0 +1,10 @@
+﻿@using NoteFactory.Web.Controllers;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<form hx-post="@Url.Action(nameof(JamsController.SendMessage), new { Model.id, Model.participantId })" hx-target="#messageActions">
+    <input type="text" name="message" required placeholder="Message..." />
+    <button type="submit">Send</button>
+</form>

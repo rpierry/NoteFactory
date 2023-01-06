@@ -72,6 +72,10 @@
         .noteGrid th {
             background-color: white;
         }
+
+        #messages .author {            
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="mainContainer">
@@ -105,7 +109,10 @@
     <section id="remoteSection">
         <h1>Shared Session</h1>
         <article id="remoteContent">
-            <button type="button" id="connect" hx-post="/Jams/Create" hx-target="#remoteContent">Connect</button>
+            <form hx-post="/Jams/Create" hx-target="#remoteContent">
+                <label for="participantName">Name:</label><input type="text" name="participantName" required /><br />
+                <button type="submit" id="create">Create</button>
+            </form>
         </article>
     </section>
     <section id="gridSection">
