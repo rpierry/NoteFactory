@@ -5,5 +5,5 @@
 @{
 }
 @foreach(Message m in Model.messages) {
-    <p><span class="author">@m.SentByName:&nbsp;</span>@m.Text</p>
+    <p><span class="author @(m.SentBy == Model.participantId ? "self" : "")">@m.SentByName:&nbsp;</span>@m.Text</p>
 }

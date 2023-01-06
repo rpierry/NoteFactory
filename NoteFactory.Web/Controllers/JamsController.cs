@@ -60,7 +60,7 @@ namespace NoteFactory.Web.Controllers
             if (c == null) return NotFound();
 
             var messages = c.MessagesSince(DateTime.MinValue).ToArray();
-            return View(new { messages });
+            return View(new { messages, participantId });
         }
 
         /* //conditional GETs work but aren't really a fit for polling and incremental message delivery
