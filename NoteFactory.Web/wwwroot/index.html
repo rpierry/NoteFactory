@@ -3,9 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <title>Note Factory</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.js"></script>
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+    <script src="js/hx-signalr.js"></script>
     <script type="module" src="js/app.js" defer></script>
-
+    <script>
+        htmx.logAll();
+    </script>
     <style>
         .mainContainer {
             display: grid;
@@ -74,14 +78,13 @@
         }
 
         #messages .author,
-        #messages .self {            
+        #messages .self {
             font-weight: bold;
         }
 
         #messages .self {
             color: green;
         }
-
     </style>
 </head>
 <body class="mainContainer">
@@ -112,17 +115,17 @@
         <button type="button" id="play">Play</button>
         <button type="button" id="stop">Stop</button>                  
     </section>
-    <section id="remoteSection">
+    <section id="remoteSection" hx-ext="signalr" signalr-connect="/JamsHub">
         <h1>Shared Session</h1>
-        <article id="remoteContent">
-            <form hx-post="/Jams/Create" hx-target="#remoteContent">
+        <article id="remoteContent" signalr-subscribe="ChatJoined,LeftChat">            
+            <form signalr-send="create" hx-target="#remoteContent">
                 <label for="participantName">Name:</label><input type="text" name="participantName" placeholder="Your name" required /><br />
                 <button type="submit" id="create">Create</button>
             </form>
-            <form hx-post="/Jams/Connect" hx-target="#remoteContent" hx-include="[name='participantName']">
+            <form signalr-send="connect" hx-target="#remoteContent" hx-include="[name='participantName']">
                 <label for="jamId">Session Id:</label><input type="text" name="jamId" placeholder="Session to join" required /><br />
                 <button type="submit" id="connect">Connect</button>
-            </form>            
+            </form>
         </article>
     </section>
     <section id="gridSection">

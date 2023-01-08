@@ -1,4 +1,5 @@
 ﻿@using NoteFactory.Web.Controllers;
+@using NoteFactory.Web.Hubs;
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -7,9 +8,13 @@
 
 <h1>Hello from the server</h1>
 You are collaborating in session @Model.id
-<button type="button" id="disconnect" hx-post="@Url.Action(nameof(JamsController.Disconnect), new { Model.id, Model.participantId } )" hx-target="#remoteContent">Disconnect</button>
+<form signalr-send="@nameof(ChatHub.Disconnect)" hx-target="#remoteContent">
+    <input type="hidden" name="id" value="@Model.id" />
+    <input type="hidden" name="participantId" value="@Model.participantId" />
+    <button type="submit" id="disconnect">Disconnect</button>
+</form>
 
-<div id="messages" hx-get="@Url.Action(nameof(JamsController.Messages), new { Model.id, Model.participantId })" hx-trigger="every 5s"></div>
+<div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend"></div>
 <div id="messageActions">
     @Html.Partial("_SendMessageForm")
 </div>

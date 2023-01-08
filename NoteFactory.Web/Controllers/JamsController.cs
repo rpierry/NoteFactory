@@ -14,7 +14,8 @@ namespace NoteFactory.Web.Controllers
         {
             _chatManager = chatManager;
         }
-
+        
+        /* moved to signalr
         string CreateId()
         {
             string? id;
@@ -73,6 +74,20 @@ namespace NoteFactory.Web.Controllers
             return View(new { messages, participantId });
         }
 
+        public IActionResult Disconnect(string id, int participantId)
+        {
+            var c = _chatManager.GetChat(id);
+            if (c == null) return NotFound();
+
+            c.RemoveParticipant(participantId);
+            if(c.IsEmpty)
+            {
+                _chatManager.DeleteChat(id);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }*/
+
         /* //conditional GETs work but aren't really a fit for polling and incremental message delivery
         [ResponseCache(Duration = 1, Location = ResponseCacheLocation.Any, VaryByQueryKeys = new[] { "id", "participantId" })]
         public IActionResult Messages(string id, int participantId)
@@ -105,19 +120,6 @@ namespace NoteFactory.Web.Controllers
         }
         */
 
-        public IActionResult Disconnect(string id, int participantId)
-        {
-            var c = _chatManager.GetChat(id);
-            if (c == null) return NotFound();
-
-            c.RemoveParticipant(participantId);
-            if(c.IsEmpty)
-            {
-                _chatManager.DeleteChat(id);
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
         public IActionResult Index()
         {
             return View();

@@ -24,8 +24,7 @@ namespace NoteFactory.Web
     }
 
     public class Message
-    {
-        Func<int, string> _nameResolver;
+    {        
         public Message(DateTime sentAt, int sentBy, string sentByName, string text)
         {
             SentAt = sentAt;
@@ -64,7 +63,7 @@ namespace NoteFactory.Web
 
         public bool IsEmpty { get { return _participants.Count == 1; } }
 
-        public void AppendMessage(int sentBy, string text)
+        public Message AppendMessage(int sentBy, string text)
         {
             var m = 
                 new Message(DateTime.Now, sentBy, 
@@ -72,6 +71,7 @@ namespace NoteFactory.Web
                     text);
             _messages.Add(m);
             LastUpdated = m.SentAt;
+            return m;
         }
 
         static int _participantId = 100;

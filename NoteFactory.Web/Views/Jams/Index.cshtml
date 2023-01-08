@@ -6,11 +6,11 @@
 }
 
 @* note that this should match what sits in /index.html *@
-<form hx-post="/Jams/Create" hx-target="#remoteContent">
+<form signalr-send="create" hx-target="#remoteContent">
     <label for="participantName">Name:</label><input type="text" name="participantName" placeholder="Your name" required /><br />
     <button type="submit" id="create">Create</button>
 </form>
-<form hx-post="/Jams/Connect" hx-target="#remoteContent" hx-include="[name='participantName']">
+<form signalr-send="connect" hx-target="#remoteContent" hx-include="[name='participantName']">
     <label for="jamId">Session Id:</label><input type="text" name="jamId" placeholder="Session to join" required /><br />
     <button type="submit" id="connect">Connect</button>
-</form>            
+</form>     
