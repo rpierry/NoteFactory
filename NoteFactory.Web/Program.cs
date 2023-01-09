@@ -6,7 +6,6 @@ using NoteFactory.Web.Hubs;
 //TODO: clear message form after submit
 //TODO: maybe don't render the signalr connect stuff until after they hit create or connect
 //TODO: when rendering current, include some message history in the default render for folks just Connecting
-//TODO: move CreateId into chatmanager
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddResponseCaching();

@@ -19,28 +19,12 @@ namespace NoteFactory.Web.Hubs
             return base.OnConnectedAsync();
         }
 
-        string CreateId(IChatManager chatManager)
-        {
-            string? id;
-            do
-            {
-                var sb = new StringBuilder();
-                for (var i = 0; i < 8; i++)
-                {
-                    var c = (char)(65 + Random.Shared.Next(26));
-                    sb.Append(c);
-                }
-                id = sb.ToString();
-            } while (chatManager.GetChat(id) != null);
-            return id;
-        }
-
         public record CreateRequest(string participantName);
         
         public async Task Create(IChatManager chatManager, CreateRequest createRequest) //string participantName)
-        {
-            var id = CreateId(chatManager);
-            var c = chatManager.CreateChat(id);
+        {            
+            var c = chatManager.CreateChat();
+            var id = c.Id;
             var p = await c.AddParticipant(createRequest.participantName);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, id);

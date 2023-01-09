@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using System.Xml.Linq;
 
 namespace NoteFactory.Web
@@ -7,7 +8,7 @@ namespace NoteFactory.Web
     public interface IChatManager
     {
         Chat? GetChat(string id);
-        Chat CreateChat(string id);
+        Chat CreateChat();
         void DeleteChat(string id);
     }
 
@@ -116,8 +117,25 @@ namespace NoteFactory.Web
             _messageSubcriber = messageSubscriber;
         }
 
-        public Chat CreateChat(string id)
+        string CreateId()
         {
+            string? id;
+            do
+            {
+                var sb = new StringBuilder();
+                for (var i = 0; i < 8; i++)
+                {
+                    var c = (char)(65 + Random.Shared.Next(26));
+                    sb.Append(c);
+                }
+                id = sb.ToString();
+            } while (GetChat(id) != null);
+            return id;
+        }
+
+        public Chat CreateChat()
+        {
+            var id = CreateId();
             var c = new Chat(_messageSubcriber, id);
             _chatsById[id] = c;
             return c;
