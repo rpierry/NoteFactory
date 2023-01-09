@@ -82,7 +82,7 @@
         }        
     </style>
 </head>
-<body class="mainContainer">
+<body class="mainContainer" hx-ext="signalr">
     <section id="parametersSection">
         <h1>Parameters</h1>
         <label for="vol">Volume</label><input type="range" value="0.5" min="0" max="1" step="0.01" name="vol" id="vol" list="volumeList" /><output id="volString" for="vol">50</output><br />
@@ -110,16 +110,12 @@
         <button type="button" id="play">Play</button>
         <button type="button" id="stop">Stop</button>                  
     </section>
-    <section id="remoteSection" hx-ext="signalr" signalr-connect="/JamsHub">
+    <section id="remoteSection">
         <h1>Shared Session</h1>
-        <article id="remoteContent" signalr-subscribe="ChatJoined,LeftChat">            
-            <form signalr-send="create" hx-target="#remoteContent">
+        <article id="nameEntry">
+            <form hx-post="Jams/CreateOrConnect" hx-target="#remoteSection" hx-swap="outerHTML">
                 <label for="participantName">Name:</label><input type="text" name="participantName" placeholder="Your name" required /><br />
-                <button type="submit" id="create">Create</button>
-            </form>
-            <form signalr-send="connect" hx-target="#remoteContent" hx-include="[name='participantName']">
-                <label for="jamId">Session Id:</label><input type="text" name="jamId" placeholder="Session to join" required /><br />
-                <button type="submit" id="connect">Connect</button>
+                <button type="submit">Next</button>
             </form>
         </article>
     </section>

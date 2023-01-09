@@ -25,7 +25,7 @@ namespace NoteFactory.Web.Hubs
         {
             var messages = c.MessagesSince(DateTime.Now.AddMinutes(-30));
 
-            var html = await ViewRenderer.RenderToString(Context.GetHttpContext(), "Jams/Current",
+            var html = await ViewRenderer.RenderToString(Context.GetHttpContext(), "Current",
                 new { id = c.Id, participantId, messages });
             await Clients.Caller.ChatJoined(html);
         }
