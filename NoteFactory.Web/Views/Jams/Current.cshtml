@@ -14,7 +14,12 @@ You are collaborating in session @Model.id
     <button type="submit" id="disconnect">Disconnect</button>
 </form>
 
-<div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend"></div>
+<div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend">
+    @foreach(var m in Model.messages)
+    {
+        @Html.Partial("_Message", new { Message = m })
+    }
+</div>
 <div id="messageActions">
     @Html.Partial("_SendMessageForm")
 </div>

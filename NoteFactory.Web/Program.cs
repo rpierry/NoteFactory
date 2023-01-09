@@ -5,7 +5,6 @@ using NoteFactory.Web.Hubs;
 //TODO: participant specific formatting in _message view - need to know part id of each connected person while rendering
 //TODO: clear message form after submit
 //TODO: maybe don't render the signalr connect stuff until after they hit create or connect
-//TODO: when rendering current, include some message history in the default render for folks just Connecting
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddResponseCaching();

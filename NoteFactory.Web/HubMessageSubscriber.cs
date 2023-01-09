@@ -24,7 +24,7 @@ namespace NoteFactory.Web
             
             var messageHtml =
                 await ViewRenderer.RenderToString(_httpContext.HttpContext, "_Message",
-                    new { Message = m, participantId = 12345 });
+                    new { Message = m });
 
             await _context.Clients.Group(chatId).NewMessage(messageHtml);            
         }

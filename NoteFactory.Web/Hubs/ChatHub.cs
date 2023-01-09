@@ -21,6 +21,15 @@ namespace NoteFactory.Web.Hubs
 
         public record CreateRequest(string participantName);
         
+        async Task RenderCurrentView(Chat c, int participantId)
+        {
+            var messages = c.MessagesSince(DateTime.Now.AddMinutes(-30));
+
+            var html = await ViewRenderer.RenderToString(Context.GetHttpContext(), "Jams/Current",
+                new { id = c.Id, participantId, messages });
+            await Clients.Caller.ChatJoined(html);
+        }
+
         public async Task Create(IChatManager chatManager, CreateRequest createRequest) //string participantName)
         {            
             var c = chatManager.CreateChat();
@@ -28,9 +37,8 @@ namespace NoteFactory.Web.Hubs
             var p = await c.AddParticipant(createRequest.participantName);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, id);
-            
-            var html = await ViewRenderer.RenderToString(Context.GetHttpContext(), "Jams/Current", new { id, participantId = p.Id }); 
-            await Clients.Caller.ChatJoined(html);                        
+
+            await RenderCurrentView(c, p.Id);            
         }
 
         Chat GetChatOrThrow(IChatManager chatManager, string id)
@@ -49,9 +57,7 @@ namespace NoteFactory.Web.Hubs
 
             await Groups.AddToGroupAsync(Context.ConnectionId, c.Id);
 
-            var html = await ViewRenderer.RenderToString(Context.GetHttpContext(), "Jams/Current",
-                new { id = c.Id, participantId = p.Id });
-            await Clients.Caller.ChatJoined(html);
+            await RenderCurrentView(c, p.Id);
         }
 
         public record SendMessageRequest(string id, string participantId, string message);

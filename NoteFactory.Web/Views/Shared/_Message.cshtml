@@ -1,6 +1,8 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+    we can't safely use .participantId here because we might be rendering this to notify everyone, not just the caller
 *@
 @{
 }
-<p><span class="author @(Model.Message.SentBy == Model.participantId ? "self" : "")">@Model.Message.SentByName:&nbsp;</span>@Model.Message.Text</p>
+<p><span class="author">@Model.Message.SentByName:&nbsp;</span>@Model.Message.Text</p>
