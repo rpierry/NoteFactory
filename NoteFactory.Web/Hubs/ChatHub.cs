@@ -41,7 +41,7 @@ namespace NoteFactory.Web.Hubs
         {
             var id = CreateId(chatManager);
             var c = chatManager.CreateChat(id);
-            var p = c.AddParticipant(createRequest.participantName);
+            var p = await c.AddParticipant(createRequest.participantName);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, id);
             
@@ -61,7 +61,7 @@ namespace NoteFactory.Web.Hubs
         {
             var c = GetChatOrThrow(chatManager, connectRequest.jamId);
 
-            var p = c.AddParticipant(connectRequest.participantName);
+            var p = await c.AddParticipant(connectRequest.participantName);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, c.Id);
 
@@ -77,20 +77,14 @@ namespace NoteFactory.Web.Hubs
             var c = GetChatOrThrow(chatManager, sendMessageRequest.id);
 
             var partIdInt = int.Parse(sendMessageRequest.participantId);
-            var m = c.AppendMessage(partIdInt, sendMessageRequest.message);
-
-            var messageHtml =
-                await ViewRenderer.RenderToString(Context.GetHttpContext(), "_Message",
-                    new { Message = m, participantId = 12345 });
-
-            await Clients.Group(sendMessageRequest.id).NewMessage(messageHtml);
+            await c.AppendMessage(partIdInt, sendMessageRequest.message);
         }
 
         public record DisconnectRequest(string id, string participantId);
         public async Task Disconnect(IChatManager chatManager, DisconnectRequest disconnectRequest)
         {
             var c = GetChatOrThrow(chatManager, disconnectRequest.id);
-            c.RemoveParticipant(int.Parse(disconnectRequest.participantId));
+            await c.RemoveParticipant(int.Parse(disconnectRequest.participantId));
             if (c.IsEmpty)
             {
                 chatManager.DeleteChat(disconnectRequest.id);

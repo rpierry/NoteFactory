@@ -6,13 +6,14 @@ using NoteFactory.Web.Hubs;
 //TODO: clear message form after submit
 //TODO: maybe don't render the signalr connect stuff until after they hit create or connect
 //TODO: when rendering current, include some message history in the default render for folks just Connecting
-//TODO: refactor so chatmanager raises an event on message send - use that to send to the clients?
 //TODO: move CreateId into chatmanager
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddResponseCaching();
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<IChatManager>(new ChatManager());
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient(typeof(IMessageSubscriber), typeof(HubMessageSubscriber));
+builder.Services.AddSingleton<IChatManager, ChatManager>();
 builder.Services.AddSignalR(
     o =>
     {

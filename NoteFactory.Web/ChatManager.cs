@@ -43,8 +43,11 @@ namespace NoteFactory.Web
     public class Chat
     {
         const int SystemId = 0;
-        public Chat(string id)
+        IMessageSubscriber _messageSubscriber;
+        public Chat(IMessageSubscriber messageSubscriber, string id)
         {
+            _messageSubscriber = messageSubscriber;
+
             Id = id;
             _participants = new List<Participant>();
             _messages = new List<Message>();
@@ -63,7 +66,7 @@ namespace NoteFactory.Web
 
         public bool IsEmpty { get { return _participants.Count == 1; } }
 
-        public Message AppendMessage(int sentBy, string text)
+        public async Task<Message> AppendMessage(int sentBy, string text)
         {
             var m = 
                 new Message(DateTime.Now, sentBy, 
@@ -71,27 +74,30 @@ namespace NoteFactory.Web
                     text);
             _messages.Add(m);
             LastUpdated = m.SentAt;
+
+            await _messageSubscriber.MessageAppended(Id, m);
+
             return m;
         }
 
         static int _participantId = 100;
-        public Participant AddParticipant(string name)
+        public async Task<Participant> AddParticipant(string name)
         {
             var p = new Participant(_participantId++, name);
             _participants.Add(p);
 
-            AppendMessage(SystemId, $"{name} joined the chat");
+            await AppendMessage(SystemId, $"{name} joined the chat");
 
             return p;
         }
 
-        public void RemoveParticipant(int id) 
+        public async Task RemoveParticipant(int id) 
         { 
             var p = _participants.SingleOrDefault(p => p.Id == id);
             if (p != null)
             {
                 _participants.Remove(p);
-                AppendMessage(SystemId, $"{p.Name} left the chat");
+                await AppendMessage(SystemId, $"{p.Name} left the chat");
             }
         }
 
@@ -104,9 +110,15 @@ namespace NoteFactory.Web
     public class ChatManager : IChatManager
     {
         Dictionary<string, Chat> _chatsById = new Dictionary<string, Chat>();
+        IMessageSubscriber _messageSubcriber;
+        public ChatManager(IMessageSubscriber messageSubscriber)
+        {
+            _messageSubcriber = messageSubscriber;
+        }
+
         public Chat CreateChat(string id)
         {
-            var c = new Chat(id);
+            var c = new Chat(_messageSubcriber, id);
             _chatsById[id] = c;
             return c;
         }
