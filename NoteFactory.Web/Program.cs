@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using NoteFactory.Web;
 using NoteFactory.Web.Hubs;
 
-//TODO: participant specific formatting in _message view - need to know part id of each connected person while rendering
 //TODO: clear message form after submit
 //TODO: maybe don't render the signalr connect stuff until after they hit create or connect
 

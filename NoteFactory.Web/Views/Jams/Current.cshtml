@@ -13,7 +13,12 @@ You are collaborating in session @Model.id
     <input type="hidden" name="participantId" value="@Model.participantId" />
     <button type="submit" id="disconnect">Disconnect</button>
 </form>
-
+<style>
+    #messages .author-@Model.participantId {
+        font-weight: bold;
+        color: green;
+    }
+</style>
 <div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend">
     @foreach(var m in Model.messages)
     {
