@@ -4,7 +4,7 @@
 *@
 @{
 }
-<form signalr-send="@nameof(ChatHub.SendMessage)">
+<form signalr-send="@nameof(ChatHub.SendMessage)" _="on htmx:signalr:afterSend reset() me">
     <input type="hidden" name="id" value="@Model.id" />
     <input type="hidden" name="participantId" value="@Model.participantId" />
     <input type="text" name="message" required placeholder="Message..." />

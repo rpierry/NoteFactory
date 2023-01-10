@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using NoteFactory.Web;
 using NoteFactory.Web.Hubs;
 
-//TODO: clear message form after submit
-
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddResponseCaching();
 builder.Services.AddControllersWithViews();

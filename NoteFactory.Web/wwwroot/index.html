@@ -5,6 +5,7 @@
     <title>Note Factory</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.js"></script>
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
     <script src="js/hx-signalr.js"></script>
     <script type="module" src="js/app.js" defer></script>
     <script>
@@ -45,9 +46,9 @@
             background-color: lightblue;
         }
 
-        .step.active {
-            background-color: lightgreen;
-        }
+            .step.active {
+                background-color: lightgreen;
+            }
 
         .note {
         }
@@ -79,7 +80,7 @@
 
         #messages .author {
             font-weight: bold;
-        }        
+        }
     </style>
 </head>
 <body class="mainContainer" hx-ext="signalr">
