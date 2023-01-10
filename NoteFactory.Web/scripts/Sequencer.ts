@@ -152,6 +152,15 @@ class Sequencer {
             this._pattern[i] = n;
         }
     }
+
+    clearAll() {
+        let newPattern: SameAs[][] = [];
+        for (var i = 0; i < newPattern.length; i++) {
+            newPattern[i] = new Array<SameAs>();
+        }
+
+        this._pattern = newPattern;
+    }
 }
 
 export { Sequencer, TimeSource, SameAs, NoteLength };

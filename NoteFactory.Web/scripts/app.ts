@@ -1,10 +1,26 @@
 ﻿
 import { NoteLength, Sequencer } from "./Sequencer.js";
-import { Note, NoteNames, Octave } from "./Note.js";
+import { Note, NoteName, NoteNames, Octave } from "./Note.js";
 import { Synthesizer } from "./Synthesizer.js";
+
+
+interface StateSnapshot {
+    steps: number,
+    bpm: number,
+    noteLength: NoteLength,    
+    pattern: { noteName: NoteName, octave: Octave }[][],
+    octaveDelta: number,
+    attackTime: number,
+    decayTime: number,
+    releaseTime: number,
+    attackLevel: number,
+    sustainLevel: number
+}
 
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");
+const btnSaveState: HTMLButtonElement = document.querySelector("#saveState");
+const btnLoadState: HTMLButtonElement = document.querySelector("#loadState");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const outVol: HTMLOutputElement = document.querySelector("#volString");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
@@ -23,6 +39,8 @@ const tblGrid: HTMLTableElement = document.querySelector("#noteGrid");
 
 btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
+btnSaveState.addEventListener("click", () => { console.log(SaveStateSnapshot()); });
+btnLoadState.addEventListener("click", TestLoad);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
 selNoteLength.addEventListener("change", ChangeNoteLength, false);
@@ -128,7 +146,7 @@ function SetADRTimes() {
     synthesizer.envelope.releaseTime = releaseTime * factor * secondsPerBeat;
 }
 
-function ChangeEnvelope(this: HTMLInputElement, ev: Event) {
+function ChangeEnvelope(this: HTMLInputElement) {
     let valAsFloat = parseFloat(this.value);    
 
     switch (this.id) {
@@ -146,7 +164,7 @@ function ChangeEnvelope(this: HTMLInputElement, ev: Event) {
     }
 }
 
-function GridNoteClicked(this: Element, ev: Event) {    
+function GridNoteClicked(this: Element) { 
     //find col and row
     let td = this as HTMLTableCellElement;
     let tr = td.parentElement as HTMLTableRowElement;
@@ -173,6 +191,11 @@ function SelectNote(grid: HTMLTableElement, step: number, n: Note) {
     let row = grid.querySelector('tr[data-note="' + dataLabel + '"]');
     let tds = row.querySelectorAll('td.note');
     tds[step].classList.add('selected');
+}
+
+function ClearSelectedNotes(grid: HTMLTableElement) {
+    let tds = grid.querySelectorAll('td.note');
+    tds.forEach((e) => e.classList.remove('selected'));
 }
 
 function ChangeSteps() {
@@ -237,4 +260,72 @@ function ChangeSteps() {
     sequencer.forEachNote((step: number, n: Note) => SelectNote(tblGrid, step, n));
 
     outSteps.value = rngSteps.value;
+}
+
+function SaveStateSnapshot(): string {
+    var pat: { noteName: NoteName, octave: Octave }[][] = [];
+
+    var objState =
+    {
+        steps: sequencer.steps,
+        bpm: sequencer.bpm,
+        noteLength: sequencer.noteLength,
+        pattern: pat,
+        octaveDelta: parseInt(rngOct.value),
+        attackTime: parseFloat(rngAttackTime.value),
+        decayTime: parseFloat(rngDecayTime.value),
+        releaseTime: parseFloat(rngReleaseTime.value),
+        attackLevel: synthesizer.envelope.attackLevel,
+        sustainLevel: synthesizer.envelope.sustainLevel
+    };
+
+    sequencer.forEachNote((s, n) => {
+        if (objState.pattern[s] == null) objState.pattern[s] = new Array<{ noteName: NoteName, octave: Octave }>();
+        var note = n as Note;
+        objState.pattern[s].push({ noteName: note.noteName, octave: note.octave });
+    });
+
+    return JSON.stringify(objState);
+}
+
+function LoadStateSnapshot(state: string) {
+    var objState: StateSnapshot = JSON.parse(state);
+
+    sequencer.clearAll();
+    ClearSelectedNotes(tblGrid);
+
+    rngSteps.value = objState.steps.toString();
+    ChangeSteps();
+
+    rngBpm.value = objState.bpm.toString();
+    ChangeBpm();
+
+    selNoteLength.value = objState.noteLength;
+    ChangeNoteLength();
+
+    //pattern
+    for (var i = 0; i < objState.pattern.length; i++) {
+        for (var n of objState.pattern[i]) {
+            let note = new Note(n.noteName, n.octave, 1);
+            sequencer.addToStep(i, note);
+            SelectNote(tblGrid, i, note);
+        }
+    }
+
+    rngOct.value = objState.octaveDelta.toString();
+    ChangeOctave();
+
+    rngAttackLevel.value = objState.attackLevel.toString();
+    rngAttackTime.value = objState.attackTime.toString();
+    rngDecayTime.value = objState.decayTime.toString();
+    rngSustainLevel.value = objState.sustainLevel.toString();
+    rngReleaseTime.value = objState.releaseTime.toString();
+    
+    synthesizer.envelope.attackLevel = objState.attackLevel;
+    synthesizer.envelope.sustainLevel = objState.sustainLevel;
+    SetADRTimes();
+}
+
+function TestLoad() {
+    LoadStateSnapshot('{"steps":21,"bpm":154,"noteLength":"sixteenth","pattern":[[{"noteName":261.63,"octave":3},{"noteName":329.63,"octave":3},{"noteName":493.88,"octave":5}],[{"noteName":293.67,"octave":3},{"noteName":349.23,"octave":3},{"noteName":440,"octave":5}],[{"noteName":329.63,"octave":3},{"noteName":392,"octave":3},{"noteName":392,"octave":5}],[{"noteName":349.23,"octave":3},{"noteName":440,"octave":3},{"noteName":349.23,"octave":5}],[{"noteName":392,"octave":3},{"noteName":329.63,"octave":5}],[{"noteName":440,"octave":3}],[{"noteName":493.88,"octave":3}],[{"noteName":261.63,"octave":4},{"noteName":261.63,"octave":3}],[{"noteName":293.67,"octave":4},{"noteName":293.67,"octave":3}],[{"noteName":329.63,"octave":4},{"noteName":293.67,"octave":3},{"noteName":329.63,"octave":3}],[{"noteName":349.23,"octave":4},{"noteName":329.63,"octave":3},{"noteName":349.23,"octave":3}],[{"noteName":392,"octave":4},{"noteName":392,"octave":3}],[{"noteName":440,"octave":4},{"noteName":440,"octave":3}],[{"noteName":493.88,"octave":4},{"noteName":493.88,"octave":3}],[{"noteName":261.63,"octave":5},{"noteName":261.63,"octave":4}],[{"noteName":293.67,"octave":5},{"noteName":293.67,"octave":4}],[{"noteName":329.63,"octave":5},{"noteName":329.63,"octave":4}],[{"noteName":349.23,"octave":5},{"noteName":349.23,"octave":4}],[{"noteName":392,"octave":5},{"noteName":349.23,"octave":4},{"noteName":392,"octave":4}],[{"noteName":440,"octave":5},{"noteName":440,"octave":4}],[{"noteName":493.88,"octave":5},{"noteName":493.88,"octave":4}]],"octaveDelta":1,"attackTime":0.49,"decayTime":0.53,"releaseTime":0.08,"attackLevel":0.24,"sustainLevel":0.1}');
 }
