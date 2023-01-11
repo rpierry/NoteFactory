@@ -1,5 +1,6 @@
 ﻿@using NoteFactory.Web.Controllers;
 @using NoteFactory.Web.Hubs;
+@using NoteFactory.Web;
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -22,9 +23,17 @@ You are collaborating in session @Model.id
 <div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend">
     @foreach(var m in Model.messages)
     {
-        @Html.Partial("_Message", new { Message = m })
+        @await Html.PartialAsync("_Message", new { Message = m })
     }
 </div>
 <div id="messageActions">
-    @Html.Partial("_SendMessageForm")
+    @await Html.PartialAsync("_SendMessageForm")
+
+    <form signalr-send="@nameof(ChatHub.SendMessage)" _="on htmx:signalr:beforeSend set detail.allParameters.message to SaveStateSnapshot()">
+        <input type="hidden" name="id" value="@Model.id" />
+        <input type="hidden" name="participantId" value="@Model.participantId" />
+        <input type="hidden" name="messageType" value="@MessageType.ShareState" />
+        <input type="hidden" name="message" value="" />
+    <button type="submit">Share Pattern</button>
+</form>
 </div>

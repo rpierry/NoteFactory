@@ -19,8 +19,6 @@ interface StateSnapshot {
 
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
 const btnStop: HTMLButtonElement = document.querySelector("#stop");
-const btnSaveState: HTMLButtonElement = document.querySelector("#saveState");
-const btnLoadState: HTMLButtonElement = document.querySelector("#loadState");
 const rngVol: HTMLInputElement = document.querySelector("#vol");
 const outVol: HTMLOutputElement = document.querySelector("#volString");
 const rngBpm: HTMLInputElement = document.querySelector("#bpm");
@@ -39,8 +37,6 @@ const tblGrid: HTMLTableElement = document.querySelector("#noteGrid");
 
 btnPlay.addEventListener("click", Play);
 btnStop.addEventListener("click", Stop);
-btnSaveState.addEventListener("click", () => { console.log(SaveStateSnapshot()); });
-btnLoadState.addEventListener("click", TestLoad);
 rngVol.addEventListener("change", ChangeVolume, false);
 rngBpm.addEventListener("change", ChangeBpm, false);
 selNoteLength.addEventListener("change", ChangeNoteLength, false);
@@ -125,9 +121,6 @@ function ChangeNoteLength() {
 
 function ChangeOctave() {
     outOct.value = rngOct.value;
-
-    //sequencer.mapNotes(
-    //    (n: Note) => new Note(n.noteName, parseInt(rngOct.value) as Octave, n.beatDuration));
 }
 
 function SetADRTimes() {
@@ -279,8 +272,13 @@ function SaveStateSnapshot(): string {
         sustainLevel: synthesizer.envelope.sustainLevel
     };
 
-    sequencer.forEachNote((s, n) => {
-        if (objState.pattern[s] == null) objState.pattern[s] = new Array<{ noteName: NoteName, octave: Octave }>();
+    //foreachnote only gets called for pattern steps that have notes, so we have to init
+    //all of the arrays ourselves first, just to make sure we serialize empty arrays instead of nulls
+    for (var i = 0; i < sequencer.steps; i++) {
+        objState.pattern[i] = new Array<{ noteName: NoteName, octave: Octave }>();
+    }
+
+    sequencer.forEachNote((s, n) => {        
         var note = n as Note;
         objState.pattern[s].push({ noteName: note.noteName, octave: note.octave });
     });
@@ -326,6 +324,6 @@ function LoadStateSnapshot(state: string) {
     SetADRTimes();
 }
 
-function TestLoad() {
-    LoadStateSnapshot('{"steps":21,"bpm":154,"noteLength":"sixteenth","pattern":[[{"noteName":261.63,"octave":3},{"noteName":329.63,"octave":3},{"noteName":493.88,"octave":5}],[{"noteName":293.67,"octave":3},{"noteName":349.23,"octave":3},{"noteName":440,"octave":5}],[{"noteName":329.63,"octave":3},{"noteName":392,"octave":3},{"noteName":392,"octave":5}],[{"noteName":349.23,"octave":3},{"noteName":440,"octave":3},{"noteName":349.23,"octave":5}],[{"noteName":392,"octave":3},{"noteName":329.63,"octave":5}],[{"noteName":440,"octave":3}],[{"noteName":493.88,"octave":3}],[{"noteName":261.63,"octave":4},{"noteName":261.63,"octave":3}],[{"noteName":293.67,"octave":4},{"noteName":293.67,"octave":3}],[{"noteName":329.63,"octave":4},{"noteName":293.67,"octave":3},{"noteName":329.63,"octave":3}],[{"noteName":349.23,"octave":4},{"noteName":329.63,"octave":3},{"noteName":349.23,"octave":3}],[{"noteName":392,"octave":4},{"noteName":392,"octave":3}],[{"noteName":440,"octave":4},{"noteName":440,"octave":3}],[{"noteName":493.88,"octave":4},{"noteName":493.88,"octave":3}],[{"noteName":261.63,"octave":5},{"noteName":261.63,"octave":4}],[{"noteName":293.67,"octave":5},{"noteName":293.67,"octave":4}],[{"noteName":329.63,"octave":5},{"noteName":329.63,"octave":4}],[{"noteName":349.23,"octave":5},{"noteName":349.23,"octave":4}],[{"noteName":392,"octave":5},{"noteName":349.23,"octave":4},{"noteName":392,"octave":4}],[{"noteName":440,"octave":5},{"noteName":440,"octave":4}],[{"noteName":493.88,"octave":5},{"noteName":493.88,"octave":4}]],"octaveDelta":1,"attackTime":0.49,"decayTime":0.53,"releaseTime":0.08,"attackLevel":0.24,"sustainLevel":0.1}');
-}
+//'export' this to the browser so we can call it from hyperscript later
+(window as any).SaveStateSnapshot = SaveStateSnapshot;
+(window as any).LoadStateSnapshot = LoadStateSnapshot;

@@ -60,14 +60,15 @@ namespace NoteFactory.Web.Hubs
             await RenderCurrentView(c, p.Id);
         }
 
-        public record SendMessageRequest(string id, string participantId, string message);
+        public record SendMessageRequest(string id, string participantId, string messageType, string message);
 
         public async Task SendMessage(IChatManager chatManager, SendMessageRequest sendMessageRequest)
         {
             var c = GetChatOrThrow(chatManager, sendMessageRequest.id);
 
             var partIdInt = int.Parse(sendMessageRequest.participantId);
-            await c.AppendMessage(partIdInt, sendMessageRequest.message);
+            var messageType = (MessageType)Enum.Parse(typeof(MessageType), sendMessageRequest.messageType);
+            await c.AppendMessage(partIdInt, messageType, sendMessageRequest.message);
         }
 
         public record DisconnectRequest(string id, string participantId);

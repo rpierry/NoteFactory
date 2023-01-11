@@ -24,13 +24,20 @@ namespace NoteFactory.Web
         public string Name { get; private set; }        
     }
 
+    public enum MessageType
+    {
+        Chat = 0,
+        ShareState = 1,
+    }
+
     public class Message
     {        
-        public Message(DateTime sentAt, int sentBy, string sentByName, string text)
+        public Message(DateTime sentAt, int sentBy, string sentByName, MessageType messageType, string text)
         {
             SentAt = sentAt;
             SentBy = sentBy;
             SentByName = sentByName;
+            MessageType = messageType;
             Text = text;
         }
 
@@ -38,6 +45,7 @@ namespace NoteFactory.Web
         public int SentBy { get; private set; }
 
         public string SentByName { get; private set; }
+        public MessageType MessageType { get; private set; }
         public string Text { get; private set; }
     }
 
@@ -67,11 +75,12 @@ namespace NoteFactory.Web
 
         public bool IsEmpty { get { return _participants.Count == 1; } }
 
-        public async Task<Message> AppendMessage(int sentBy, string text)
+        public async Task<Message> AppendMessage(int sentBy, MessageType messageType, string text)
         {
             var m = 
                 new Message(DateTime.Now, sentBy, 
                     Participants.FirstOrDefault(p => p.Id == sentBy)?.Name ?? sentBy.ToString(),
+                    messageType,
                     text);
             _messages.Add(m);
             LastUpdated = m.SentAt;
@@ -87,7 +96,7 @@ namespace NoteFactory.Web
             var p = new Participant(_participantId++, name);
             _participants.Add(p);
 
-            await AppendMessage(SystemId, $"{name} joined the chat");
+            await AppendMessage(SystemId, MessageType.Chat, $"{name} joined the chat");
 
             return p;
         }
@@ -98,7 +107,7 @@ namespace NoteFactory.Web
             if (p != null)
             {
                 _participants.Remove(p);
-                await AppendMessage(SystemId, $"{p.Name} left the chat");
+                await AppendMessage(SystemId, MessageType.Chat, $"{p.Name} left the chat");
             }
         }
 

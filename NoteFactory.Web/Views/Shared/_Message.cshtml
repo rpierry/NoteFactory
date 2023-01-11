@@ -1,8 +1,14 @@
-﻿@*
+﻿@using NoteFactory.Web;
+@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
     we can't safely use .participantId here because we might be rendering this to notify everyone, not just the caller
 *@
 @{
 }
-<p><span class="author author-@Model.Message.SentBy">@Model.Message.SentByName:&nbsp;</span>@Model.Message.Text</p>
+<p><span class="author author-@Model.Message.SentBy">@Model.Message.SentByName:&nbsp;</span>
+    @if(Model.Message.MessageType == MessageType.Chat){
+        @Model.Message.Text
+    } else {
+        <a href="#" _="on click LoadStateSnapshot('@Model.Message.Text')">Shared their pattern. Click to apply.</a>
+    }</p>
