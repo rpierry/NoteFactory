@@ -10,6 +10,20 @@
     <script type="module" src="js/app.js" defer></script>    
     <script>
         htmx.logAll();
+
+        var _hubConnection;
+
+        let createConnection = htmx.createHubConnection;
+        if (createConnection != undefined) {
+            htmx.createHubConnection = (url) => {                
+                _hubConnection = createConnection(url);
+                return _hubConnection;
+            };
+        }
+
+        function getCurrentHubConnection() {
+            return _hubConnection;
+        }
     </script>
     <style>
         .mainContainer {

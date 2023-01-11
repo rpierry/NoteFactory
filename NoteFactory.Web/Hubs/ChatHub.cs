@@ -10,6 +10,8 @@ namespace NoteFactory.Web.Hubs
         Task NewMessage(string html);
         Task ChatJoined(string html);
         Task LeftChat(string html);
+
+        Task NoteChanged(string html);
     }
 
     public class ChatHub : Hub<IChatHub>
@@ -85,6 +87,15 @@ namespace NoteFactory.Web.Hubs
                 await ViewRenderer.RenderToString(Context.GetHttpContext(), "Jams/Index", null);
 
             await Clients.Caller.LeftChat(html);
+        }
+
+        public record NoteChangedRequest(string id, bool added, int step, string noteData);
+        public async Task NoteChanged(NoteChangedRequest noteChangedRequest)
+        {
+            var html =
+                await ViewRenderer.RenderToString(Context.GetHttpContext(), "_NoteChanged",
+                    new { noteChangedRequest.added, noteChangedRequest.step, noteChangedRequest.noteData });
+            await Clients.OthersInGroup(noteChangedRequest.id).NoteChanged(html);
         }
     }
 }

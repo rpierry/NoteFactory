@@ -34,6 +34,8 @@ You are collaborating in session @Model.id
         <input type="hidden" name="participantId" value="@Model.participantId" />
         <input type="hidden" name="messageType" value="@MessageType.ShareState" />
         <input type="hidden" name="message" value="" />
-    <button type="submit">Share Pattern</button>
-</form>
+        <button type="submit">Share Pattern</button>
+    </form>
+    <label for="shareUpdates">Share note updates live</label><input type="checkbox" id="shareUpdates" name="shareUpdates" />
+    <div style="display: none" signalr-subscribe="NoteChanged" hx-swap="innerHTML"></div>
 </div>

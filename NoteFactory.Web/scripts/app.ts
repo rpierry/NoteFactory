@@ -157,6 +157,11 @@ function ChangeEnvelope(this: HTMLInputElement) {
     }
 }
 
+function IsSubscribedToNoteUpdates() {
+    let chkShare = document.querySelector('#shareUpdates') as HTMLInputElement;
+    return (chkShare != null) && chkShare.checked;
+}
+
 function GridNoteClicked(this: Element) { 
     //find col and row
     let td = this as HTMLTableCellElement;
@@ -169,21 +174,42 @@ function GridNoteClicked(this: Element) {
     let note = new Note(NoteNames[noteNameKey], octaveKey, 1);
 
     let step = td.cellIndex - 1; //account for the th
+    let added = true;
 
     if (td.classList.contains('selected')) {
+        added = false;
         sequencer.removeFromStep(step, note);
         td.classList.remove('selected');
     } else {
         sequencer.addToStep(step, note);
         td.classList.add('selected');
     }
+    
+    
+    let idHidden = document.querySelector('form input[name="id"]') as HTMLInputElement;
+    if (IsSubscribedToNoteUpdates()) {
+        let connection = (window as any).getCurrentHubConnection();        
+        if ((connection != undefined) && (connection.state == "Connected")) {            
+            //public record NoteChangedRequest(string id, bool added, int step, string noteData);
+            connection.send("NoteChanged", { id: idHidden.value, added: added, step: step, noteData: JSON.stringify(note) });
+        }
+    }
 }
 
-function SelectNote(grid: HTMLTableElement, step: number, n: Note) {
+function GetTdsForNote(grid: HTMLTableElement, n: Note) {
     let dataLabel = Note.getNoteNameKeyForValue(n.noteName) + n.octave.toString();
     let row = grid.querySelector('tr[data-note="' + dataLabel + '"]');
-    let tds = row.querySelectorAll('td.note');
+    return row.querySelectorAll('td.note');
+}
+
+function SelectNote(grid: HTMLTableElement, step: number, n: Note) {    
+    let tds = GetTdsForNote(grid, n);
     tds[step].classList.add('selected');
+}
+
+function ClearNote(grid: HTMLTableElement, step: number, n: Note) {
+    let tds = GetTdsForNote(grid, n);
+    tds[step].classList.remove('selected');
 }
 
 function ClearSelectedNotes(grid: HTMLTableElement) {
@@ -324,6 +350,30 @@ function LoadStateSnapshot(state: string) {
     SetADRTimes();
 }
 
+function ProcessIncomingNoteChange(el: HTMLElement) {
+    if (IsSubscribedToNoteUpdates()) {
+        let addedRaw = el.dataset['noteadded'];
+        let stepRaw = el.dataset['notestep'];
+        let dataRaw = el.dataset['notedata'];
+
+        let added = addedRaw == "True";
+        let step = parseInt(stepRaw);
+        let noteRaw = JSON.parse(dataRaw);
+        let note = new Note(noteRaw.noteName, noteRaw.octave, noteRaw.beatDuration);
+
+        if (step >= sequencer.steps) return; //ignore out of bounds data
+
+        if (added) {
+            sequencer.addToStep(step, note);
+            SelectNote(tblGrid, step, note);
+        } else {
+            sequencer.removeFromStep(step, note);
+            ClearNote(tblGrid, step, note);
+        }
+    }
+}
+
 //'export' this to the browser so we can call it from hyperscript later
 (window as any).SaveStateSnapshot = SaveStateSnapshot;
 (window as any).LoadStateSnapshot = LoadStateSnapshot;
+(window as any).ProcessIncomingNoteChange = ProcessIncomingNoteChange;
