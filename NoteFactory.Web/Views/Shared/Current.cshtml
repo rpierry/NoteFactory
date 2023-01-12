@@ -20,7 +20,7 @@ You are collaborating in session @Model.id
         color: green;
     }
 </style>
-<div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend">
+<div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend" _="on htmx:load detail.elt.scrollIntoView(false)">
     @foreach(var m in Model.messages)
     {
         @await Html.PartialAsync("_Message", new { Message = m })

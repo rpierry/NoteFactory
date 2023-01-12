@@ -3,7 +3,6 @@ using NoteFactory.Web;
 using NoteFactory.Web.Hubs;
 
 //TODO: visual design
-//TODO: scroll messages to end on new message
 //TODO: undo/revert button after loading someone else's shared grid?
 
 var builder = WebApplication.CreateBuilder(args);
