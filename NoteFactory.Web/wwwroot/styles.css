@@ -1,0 +1,78 @@
+﻿.mainContainer {
+    display: grid;
+    
+    grid-template-areas:
+        "head1-1 head1-2 head1-3"        
+        "content content sidebar";
+    
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 4fr;
+    align-items: start;
+    gap: 20px;
+}
+
+#parametersSection {
+    grid-area: head1-1;    
+}
+
+#envelopeSection {
+    grid-area: head1-2;
+}
+
+#actionsSection {
+    grid-area: head1-3;
+}
+
+#remoteSection {
+    grid-area: sidebar;    
+}
+
+#remoteSection #messages {
+    overflow-y: auto;
+    max-height: 40vh;
+}
+
+#gridSection {
+    grid-area: content;
+    overflow-x: auto;
+}
+
+.step {
+    background-color: lightblue;
+}
+
+    .step.active {
+        background-color: lightgreen;
+    }
+
+.note {
+}
+
+tr[data-note $= '5'] td.note {
+    /*filter: saturate(150%);*/
+    backdrop-filter: saturate(175%);
+}
+
+tr[data-note $= '3'] td.note {
+    /*filter: saturate(65%);*/
+    backdrop-filter: saturate(55%);
+}
+
+.note.selected {
+    background-color: lightsalmon;
+}
+
+.noteGrid th,
+.noteGrid td {
+    min-width: 30px;
+    min-height: 30px;
+    aspect-ratio: 1;
+}
+
+.noteGrid th {
+    background-color: white;
+}
+
+#messages .author {
+    font-weight: bold;
+}

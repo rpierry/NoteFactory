@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Note Factory</title>
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.js"></script>
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
@@ -24,78 +25,7 @@
         function getCurrentHubConnection() {
             return _hubConnection;
         }
-    </script>
-    <style>
-        .mainContainer {
-            display: grid;
-            grid-template-areas:
-                "head1-1 head1-2 sidebar"
-                "head2 head2 sidebar"
-                "content content sidebar";
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-
-        #parametersSection {
-            grid-area: head1-1;
-        }
-
-        #envelopeSection {
-            grid-area: head1-2;
-        }
-
-        #actionsSection {
-            grid-area: head2;
-        }
-
-        #remoteSection {
-            grid-area: sidebar;
-        }
-
-        #gridSection {
-            grid-area: content;
-        }
-
-        .step {
-            background-color: lightblue;
-        }
-
-            .step.active {
-                background-color: lightgreen;
-            }
-
-        .note {
-        }
-
-        tr[data-note $= '5'] td.note {
-            /*filter: saturate(150%);*/
-            backdrop-filter: saturate(175%);
-        }
-
-        tr[data-note $= '3'] td.note {
-            /*filter: saturate(65%);*/
-            backdrop-filter: saturate(55%);
-        }
-
-        .note.selected {
-            background-color: lightsalmon;
-        }
-
-        .noteGrid th,
-        .noteGrid td {
-            min-width: 30px;
-            min-height: 30px;
-            aspect-ratio: 1;
-        }
-
-        .noteGrid th {
-            background-color: white;
-        }
-
-        #messages .author {
-            font-weight: bold;
-        }
-    </style>
+    </script>    
 </head>
 <body class="mainContainer" hx-ext="signalr">
     <section id="parametersSection">
