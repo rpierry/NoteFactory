@@ -1,4 +1,23 @@
-﻿.mainContainer {
+:root {
+    --color-primary-bg: #191c32;   
+    --color-secondary-bg: white; 
+    --color-tertiary-bg: #4c269a;
+    --color-primary-action: #f1884e;
+    --color-secondary-action: #ffdfaf;    
+    --color-primary-text: #dde6e8;
+    --color-highlight-text: #f1884e;    
+}
+
+body {
+    background-color: var(--color-primary-bg);
+    color: var(--color-primary-text);
+}
+
+button {    
+    color: var(--color-primary-bg);
+}
+
+.mainContainer {
     display: grid;
     
     grid-template-areas:
@@ -38,12 +57,12 @@
 }
 
 .step {
-    background-color: lightblue;
+    background-color: var(--color-tertiary-bg);
 }
 
-    .step.active {
-        background-color: lightgreen;
-    }
+.step.active {
+    background-color: var(--color-secondary-action);
+}
 
 .note {
 }
@@ -59,7 +78,7 @@ tr[data-note $= '3'] td.note {
 }
 
 .note.selected {
-    background-color: lightsalmon;
+    background-color: var(--color-primary-action);
 }
 
 .noteGrid th,
@@ -70,7 +89,12 @@ tr[data-note $= '3'] td.note {
 }
 
 .noteGrid th {
-    background-color: white;
+    background-color: var(--color-secondary-bg);
+    color: var(--color-primary-bg);
+}
+
+.noteGrid thead tr th:first-child {
+    background-color: var(--color-primary-bg);
 }
 
 #messages .author {

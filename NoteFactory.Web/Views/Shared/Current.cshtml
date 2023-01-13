@@ -17,7 +17,7 @@ You are collaborating in session @Model.id
 <style>
     #messages .author-@Model.participantId {
         font-weight: bold;
-        color: green;
+        color: var(--color-highlight-text);
     }
 </style>
 <div id="messages" signalr-subscribe="NewMessage" hx-swap="beforeend" _="on htmx:load detail.elt.scrollIntoView(false)">
