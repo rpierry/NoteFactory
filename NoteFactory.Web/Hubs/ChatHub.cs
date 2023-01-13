@@ -10,17 +10,11 @@ namespace NoteFactory.Web.Hubs
         Task NewMessage(string html);
         Task ChatJoined(string html);
         Task LeftChat(string html);
-
         Task NoteChanged(string html);
     }
 
     public class ChatHub : Hub<IChatHub>
-    {
-        public override Task OnConnectedAsync()
-        {
-            return base.OnConnectedAsync();
-        }
-
+    {        
         public record CreateRequest(string participantName);
         
         async Task RenderCurrentView(Chat c, int participantId)
@@ -32,7 +26,7 @@ namespace NoteFactory.Web.Hubs
             await Clients.Caller.ChatJoined(html);
         }
 
-        public async Task Create(IChatManager chatManager, CreateRequest createRequest) //string participantName)
+        public async Task Create(IChatManager chatManager, CreateRequest createRequest)
         {            
             var c = chatManager.CreateChat();
             var id = c.Id;
