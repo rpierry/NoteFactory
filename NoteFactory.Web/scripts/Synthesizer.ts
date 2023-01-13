@@ -5,7 +5,10 @@ class Synthesizer {
     private _outputGain: GainNode;
     private _connectSubTo: AudioNode;
     private _connectOscTo: AudioNode;
-    private _connectOsc2To: AudioNode;    
+    private _connectOsc2To: AudioNode;  
+    private _delay: DelayNode;
+    private _delayFeedback: GainNode;
+    private _delayLevel: GainNode;
 
     constructor(ctx: AudioContext) {
         this._ctx = ctx;
@@ -37,9 +40,21 @@ class Synthesizer {
         oscGain.connect(mainMix);
         osc2Gain.connect(mainMix);
 
+        let dry = this._ctx.createGain();
+        subMix.connect(dry);
+        mainMix.connect(dry);
+
+        this._delay = this._ctx.createDelay();
+        this._delayFeedback = this._ctx.createGain();
+        this._delayLevel = this._ctx.createGain();
+        dry.connect(this._delay);
+        this._delay.connect(this._delayFeedback);
+        this._delay.connect(this._delayLevel);
+        this._delayFeedback.connect(this._delay);
+
         this._outputGain = this._ctx.createGain();
-        subMix.connect(this._outputGain);
-        mainMix.connect(this._outputGain);
+        dry.connect(this._outputGain);
+        this._delayLevel.connect(this._outputGain);
         this._outputGain.connect(this._ctx.destination);        
     }
 
@@ -64,6 +79,30 @@ class Synthesizer {
 
     set oscillatorType(val: OscillatorType) {
         this._oscillatorType = val;
+    }
+
+    get delayTime() {
+        return this._delay.delayTime.value;
+    }
+
+    set delayTime(time: number) {
+        this._delay.delayTime.value = time;
+    }
+
+    get delayFeedback() {
+        return this._delayFeedback.gain.value;
+    }
+
+    set delayFeedback(gain: number) {
+        this._delayFeedback.gain.value = gain;
+    }
+
+    get delayLevel() {
+        return this._delayLevel.gain.value;
+    }
+
+    set delayLevel(gain: number) {
+        this._delayLevel.gain.value = gain;
     }
 
     readonly envelope: Envelope;

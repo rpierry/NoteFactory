@@ -28,7 +28,7 @@
     </script>    
 </head>
 <body class="mainContainer" hx-ext="signalr">
-    <section id="parametersSection">
+    <section id="parametersSection" class="paramSection">
         <h1>Parameters</h1>
         <label for="vol">Volume</label><input type="range" value="0.5" min="0" max="1" step="0.01" name="vol" id="vol" list="volumeList" /><output id="volString" for="vol">50</output>
         <label for="bpm">BPM</label><input type="range" value="120" min="40" max="200" step="1" name="bpm" id="bpm" /><output id="bpmString" for="bpm">120</output>
@@ -42,7 +42,7 @@
         <label for="octave">Octave</label><input type="range" value="0" min="-2" max="2" step="1" name="octave" id="octave" /><output id="octaveString" for="octave">0</output>
         <label for="steps">Steps</label><input type="range" value="8" min="4" max="32" step="1" name="steps" id="steps" /><output id="stepsString" for="steps">8</output>
     </section>
-    <section id="envelopeSection">
+    <section id="envelopeSection" class="paramSection">
         <h1>Envelope</h1>
         <label for="attackLevel">Attack Level</label><input type="range" value="1" min="0" max="1" step="0.01" name="attackLevel" id="attackLevel" /> 
         <label for="attackTime">Attack Time</label><input type="range" value="0.05" min="0" max="1" step="0.01" name="attackTime" id="attackTime" /> 
@@ -50,10 +50,12 @@
         <label for="sustainLevel">Sustain Level</label><input type="range" value="0.9" min="0" max="1" step="0.01" name="sustainLevel" id="sustainLevel" /> 
         <label for="releaseTime">Release Time</label><input type="range" value="0.3" min="0" max="1" step="0.01" name="releaseTime" id="releaseTime" /> 
     </section>
-    <section id="actionsSection">
-        <h1>Actions</h1>        
-        <button type="button" id="play">Play</button>
-        <button type="button" id="stop">Stop</button>        
+    <section id="effectsSection" class="paramSection">
+        <h1>Effects</h1>   
+        <label for="delayTime">Delay Time</label><input type="range" value="200" min="0" max="1000" step="10" name="delayTime" id="delayTime" />
+        <label for="delayFeedback">Feedback</label><input type="range" value="0.3" min="0" max="0.9" step="0.01" name="delayFeedback" id="delayFeedback" />
+        <label for="delayLevel">Delay Level</label><input type="range" value="0.3" min="0" max="1" step="0.01" name="delayLevel" id="delayLevel" />        
+        <!-- Reverb Amount Reverb Level -->
     </section>
     <section id="remoteSection">
         <h1>Shared Session</h1>
@@ -66,7 +68,11 @@
         </article>
     </section>
     <section id="gridSection">
-        <h1>Note Grid</h1>
+        <h1>
+            Note Grid 
+            <button type="button" id="play">Play</button>
+            <button type="button" id="stop">Stop</button>
+        </h1>
 
         <table id="noteGrid" class="noteGrid">
             <caption>Sequencer Grid</caption>

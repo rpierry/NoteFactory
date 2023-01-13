@@ -14,7 +14,10 @@ interface StateSnapshot {
     decayTime: number,
     releaseTime: number,
     attackLevel: number,
-    sustainLevel: number
+    sustainLevel: number,
+    delayTime: number,
+    delayFeedback: number,
+    delayLevel: number
 }
 
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
@@ -33,6 +36,9 @@ const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
 const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
 const rngSustainLevel: HTMLInputElement = document.querySelector("#sustainLevel");
 const rngReleaseTime: HTMLInputElement = document.querySelector("#releaseTime");
+const rngDelayTime: HTMLInputElement = document.querySelector("#delayTime");
+const rngDelayFeedback: HTMLInputElement = document.querySelector("#delayFeedback");
+const rngDelayLevel: HTMLInputElement = document.querySelector("#delayLevel");
 const tblGrid: HTMLTableElement = document.querySelector("#noteGrid");
 
 btnPlay.addEventListener("click", Play);
@@ -47,6 +53,9 @@ rngAttackTime.addEventListener("change", ChangeEnvelope, false);
 rngDecayTime.addEventListener("change", ChangeEnvelope, false);
 rngSustainLevel.addEventListener("change", ChangeEnvelope, false);
 rngReleaseTime.addEventListener("change", ChangeEnvelope, false);
+rngDelayTime.addEventListener("change", ChangeDelay, false);
+rngDelayFeedback.addEventListener("change", ChangeDelay, false);
+rngDelayLevel.addEventListener("change", ChangeDelay, false);
 
 tblGrid.querySelectorAll("td.note").forEach(e => e.addEventListener("click", GridNoteClicked));
 
@@ -56,6 +65,7 @@ const sequencer = new Sequencer(ctx, ScheduleNotes, StepChanged);
 const synthesizer = new Synthesizer(ctx);
 ChangeVolume();
 SetADRTimes();
+ChangeDelay();
 
 let playing = false;
 
@@ -155,6 +165,12 @@ function ChangeEnvelope(this: HTMLInputElement) {
             SetADRTimes();
             break;
     }
+}
+
+function ChangeDelay() {
+    synthesizer.delayTime = parseInt(rngDelayTime.value) / 1000.0;
+    synthesizer.delayFeedback = parseFloat(rngDelayFeedback.value);
+    synthesizer.delayLevel = parseFloat(rngDelayLevel.value);
 }
 
 function IsSubscribedToNoteUpdates() {
@@ -295,7 +311,10 @@ function SaveStateSnapshot(): string {
         decayTime: parseFloat(rngDecayTime.value),
         releaseTime: parseFloat(rngReleaseTime.value),
         attackLevel: synthesizer.envelope.attackLevel,
-        sustainLevel: synthesizer.envelope.sustainLevel
+        sustainLevel: synthesizer.envelope.sustainLevel,
+        delayTime: synthesizer.delayTime,
+        delayFeedback: synthesizer.delayFeedback,
+        delayLevel: synthesizer.delayLevel
     };
 
     //foreachnote only gets called for pattern steps that have notes, so we have to init
@@ -348,6 +367,11 @@ function LoadStateSnapshot(state: string) {
     synthesizer.envelope.attackLevel = objState.attackLevel;
     synthesizer.envelope.sustainLevel = objState.sustainLevel;
     SetADRTimes();
+
+    rngDelayTime.value = (Math.round(objState.delayTime * 1000)).toString();
+    rngDelayFeedback.value = objState.delayFeedback.toString();
+    rngDelayLevel.value = objState.delayLevel.toString();
+    ChangeDelay();
 }
 
 function ProcessIncomingNoteChange(el: HTMLElement) {

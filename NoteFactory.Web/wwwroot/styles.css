@@ -46,7 +46,7 @@ button {
     grid-area: head1-2;
 }
 
-#actionsSection {
+#effectsSection {
     grid-area: head1-3;
 }
 
@@ -65,29 +65,32 @@ button {
 }
 
 /* section formatting */
-#parametersSection,
-#envelopeSection {
+.paramSection {
     display: grid;
     grid-template-columns: 1fr 3fr 1fr;
     gap: 5px;
 }
 
-
-#envelopeSection label,
-#parametersSection label {
+.paramSection label {
     grid-column: 1;
 }
 
-#envelopeSection label input,
-#envelopeSection label select,
-#parametersSection label input,
-#parametersSection label select {
+.paramSection label input,
+.paramSection label select {
     grid-column: 2;
 }
 
-#envelopeSection label output,
-#parametersSection label output {
+.paramSection label output {
     grid-column: 3;
+}
+
+#gridSection h1 button {
+    vertical-align: middle;
+    margin-bottom: 5px;
+}
+
+#gridSection h1 button:first-child {
+    margin-left: 10ch;
 }
 
 #remoteContent p {
