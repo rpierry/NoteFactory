@@ -73,6 +73,7 @@ button {
 
 .paramSection label {
     grid-column: 1;
+    white-space: nowrap;
 }
 
 .paramSection label input,

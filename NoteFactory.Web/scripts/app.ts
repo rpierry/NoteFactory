@@ -15,6 +15,7 @@ interface StateSnapshot {
     releaseTime: number,
     attackLevel: number,
     sustainLevel: number,
+    thickness: number,
     delayTime: number,
     delayFeedback: number,
     delayLevel: number,
@@ -37,6 +38,7 @@ const rngAttackTime: HTMLInputElement = document.querySelector("#attackTime");
 const rngDecayTime: HTMLInputElement = document.querySelector("#decayTime");
 const rngSustainLevel: HTMLInputElement = document.querySelector("#sustainLevel");
 const rngReleaseTime: HTMLInputElement = document.querySelector("#releaseTime");
+const rngThickness: HTMLInputElement = document.querySelector("#thickness");
 const rngDelayTime: HTMLInputElement = document.querySelector("#delayTime");
 const rngDelayFeedback: HTMLInputElement = document.querySelector("#delayFeedback");
 const rngDelayLevel: HTMLInputElement = document.querySelector("#delayLevel");
@@ -55,6 +57,7 @@ rngAttackTime.addEventListener("change", ChangeEnvelope, false);
 rngDecayTime.addEventListener("change", ChangeEnvelope, false);
 rngSustainLevel.addEventListener("change", ChangeEnvelope, false);
 rngReleaseTime.addEventListener("change", ChangeEnvelope, false);
+rngThickness.addEventListener("change", ChangeThickness, false);
 rngDelayTime.addEventListener("change", ChangeDelay, false);
 rngDelayFeedback.addEventListener("change", ChangeDelay, false);
 rngDelayLevel.addEventListener("change", ChangeDelay, false);
@@ -73,6 +76,7 @@ let decoded = await ctx.decodeAudioData(buff);
 const synthesizer = new Synthesizer(ctx, decoded);
 ChangeVolume();
 SetADRTimes();
+ChangeThickness();
 ChangeDelay();
 ChangeReverb();
 
@@ -174,6 +178,10 @@ function ChangeEnvelope(this: HTMLInputElement) {
             SetADRTimes();
             break;
     }
+}
+
+function ChangeThickness() {
+    synthesizer.thickness = parseFloat(rngThickness.value);
 }
 
 function ChangeDelay() {
@@ -325,6 +333,7 @@ function SaveStateSnapshot(): string {
         releaseTime: parseFloat(rngReleaseTime.value),
         attackLevel: synthesizer.envelope.attackLevel,
         sustainLevel: synthesizer.envelope.sustainLevel,
+        thickness: synthesizer.thickness,
         delayTime: synthesizer.delayTime,
         delayFeedback: synthesizer.delayFeedback,
         delayLevel: synthesizer.delayLevel,
@@ -381,6 +390,9 @@ function LoadStateSnapshot(state: string) {
     synthesizer.envelope.attackLevel = objState.attackLevel;
     synthesizer.envelope.sustainLevel = objState.sustainLevel;
     SetADRTimes();
+
+    rngThickness.value = objState.thickness.toString();
+    ChangeThickness();
 
     rngDelayTime.value = (Math.round(objState.delayTime * 1000)).toString();
     rngDelayFeedback.value = objState.delayFeedback.toString();

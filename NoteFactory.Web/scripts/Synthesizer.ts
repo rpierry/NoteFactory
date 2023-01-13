@@ -11,6 +11,10 @@ class Synthesizer {
     private _delayLevel: GainNode;
     private _reverb: ConvolverNode;
     private _reverbLevel: GainNode;
+    private _thicknessNodes: GainNode[];
+    
+    private _split = 0.8;
+    private _defaultThickness = 0.25;
 
     constructor(ctx: AudioContext, reverbIR: AudioBuffer) {
         this._ctx = ctx;
@@ -25,22 +29,24 @@ class Synthesizer {
         this._connectOsc2To = osc2Pan;      
 
         let oscGain = this._ctx.createGain();
-        oscGain.gain.value = this._oscBalance;        
+        //oscGain.gain.value = this._oscBalance;        
         oscPan.connect(oscGain);
 
         let osc2Gain = this._ctx.createGain();
-        osc2Gain.gain.value = 1.0 - this._oscBalance;        
+        osc2Gain.gain.value = this._defaultThickness;
         osc2Pan.connect(osc2Gain);
 
         let subMix = this._ctx.createGain();
-        subMix.gain.value = this._subLevel;
+        subMix.gain.value = this._defaultThickness;
         this._connectSubTo = subMix;        
 
         let mainMix = this._ctx.createGain();
-        mainMix.gain.value = 1 - this._subLevel;        
+        //mainMix.gain.value = 1 - this._subLevel;        
 
         oscGain.connect(mainMix);
         osc2Gain.connect(mainMix);
+
+        this._thicknessNodes = [osc2Gain, subMix];        
 
         let dry = this._ctx.createGain();
         subMix.connect(dry);
@@ -96,6 +102,14 @@ class Synthesizer {
         this._oscillatorType = val;
     }
 
+    get thickness() {
+        return this._thicknessNodes[0].gain.value;
+    }
+
+    set thickness(thickness: number) {
+        this._thicknessNodes.forEach((n) => { n.gain.value = thickness; });
+    }
+
     get delayTime() {
         return this._delay.delayTime.value;
     }
@@ -140,12 +154,9 @@ class Synthesizer {
             o.stop(startTime + durationSeconds);
         }
     }
-
-    private _subLevel = 0.2;
-    private _subDetune = 5;
-    private _split = 0.7;
-    private _secondDetune = 8;
-    private _oscBalance = 0.5;
+    
+    private _subDetune = 8;    
+    private _secondDetune = 12;    
 
     private createOscillators(frequency: number, getEnvelope: () => AudioNode): [ toSchedule: AudioScheduledSourceNode[]] {
         let osc = this._ctx.createOscillator();
