@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using NoteFactory.Web;
 using NoteFactory.Web.Hubs;
 
-//TODO: visual design
 //TODO: undo/revert button after loading someone else's shared grid?
 
 var builder = WebApplication.CreateBuilder(args);

@@ -68,9 +68,10 @@ button {
 #parametersSection,
 #envelopeSection {
     display: grid;
-    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-columns: 1fr 3fr 1fr;
     gap: 5px;
 }
+
 
 #envelopeSection label,
 #parametersSection label {
