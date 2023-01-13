@@ -7,8 +7,7 @@
 @{
 }
 
-<h1>Hello from the server</h1>
-You are collaborating in session @Model.id
+<h2>You are collaborating in session @Model.id</h2>
 <form signalr-send="@nameof(ChatHub.Disconnect)">
     <input type="hidden" name="id" value="@Model.id" />
     <input type="hidden" name="participantId" value="@Model.participantId" />
