@@ -1,22 +1,30 @@
 :root {
-    --color-primary-bg: #191c32;   
+    --color-primary-bg: #0f101d;   
     --color-secondary-bg: white; 
-    --color-tertiary-bg: #4c269a;
-    --color-primary-action: #f1884e;
-    --color-secondary-action: #ffdfaf;    
+    --color-tertiary-bg: #4a229d;
+    --color-primary-action: #ff7e37;
+    --color-secondary-action: #f5f0b7;    
     --color-primary-text: #dde6e8;
-    --color-highlight-text: #f1884e;    
+    --color-highlight-text: #ff7e37;    
 }
 
 body {
     background-color: var(--color-primary-bg);
     color: var(--color-primary-text);
+
+    padding: 20px;
+}
+
+h1 {
+    color: var(--color-highlight-text);
+    filter: saturate(1.5) drop-shadow(1px 1px 15px);
 }
 
 button {    
     color: var(--color-primary-bg);
 }
 
+/* main page structure */
 .mainContainer {
     display: grid;
     
@@ -56,9 +64,77 @@ button {
     overflow-x: auto;
 }
 
+/* section formatting */
+#parametersSection,
+#envelopeSection {
+    display: grid;
+    grid-template-columns: 1fr 4fr 1fr;
+    gap: 5px;
+}
+
+#envelopeSection label,
+#parametersSection label {
+    grid-column: 1;
+}
+
+#envelopeSection label input,
+#envelopeSection label select,
+#parametersSection label input,
+#parametersSection label select {
+    grid-column: 2;
+}
+
+#envelopeSection label output,
+#parametersSection label output {
+    grid-column: 3;
+}
+
+#remoteContent p {
+    font-style: italic;
+}
+
+#remoteContent form input[maxlength='8'] {
+    max-width: 8ch;
+}
+
+#remoteSection #disconnectForm {
+    display: flex;
+}
+
+#remoteSection #disconnectForm button {
+    align-self: center;
+}
+
+#remoteSection #sendMessageForm {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 10px;
+    margin-bottom: 0.5em;
+}
+
+#remoteSection #sendMessageForm input {
+    flex: 20;
+}
+
+#remoteSection #sharePatternForm {
+    display: inline;    
+}
+
+#remoteSection #shareUpdatesInput {
+    display: inline-block;
+    text-align: right;
+}
+
+/* grid formatting */
+.noteGrid caption {
+    display: none;
+}
+
+
 .step {
     background-color: var(--color-tertiary-bg);
 }
+
 
 .step.active {
     background-color: var(--color-secondary-action);
@@ -91,12 +167,31 @@ tr[data-note $= '3'] td.note {
 .noteGrid th {
     background-color: var(--color-secondary-bg);
     color: var(--color-primary-bg);
+    opacity: 25%;
+}
+
+/* override the .step class applied to col with a more specific selector */
+.noteGrid thead tr:first-child {
+    background-color: var(--color-primary-bg);
 }
 
 .noteGrid thead tr th:first-child {
     background-color: var(--color-primary-bg);
 }
 
+/* messaging formatting */
+#messages {
+    border: 1px solid var(--color-primary-action);
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
 #messages .author {
     font-weight: bold;
+}
+
+#messages a {
+    color: var(--color-secondary-action);
 }

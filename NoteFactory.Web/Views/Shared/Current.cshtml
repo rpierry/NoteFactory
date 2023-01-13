@@ -7,10 +7,10 @@
 @{
 }
 
-<h2>You are collaborating in session @Model.id</h2>
-<form signalr-send="@nameof(ChatHub.Disconnect)">
+<form id="disconnectForm" signalr-send="@nameof(ChatHub.Disconnect)">
     <input type="hidden" name="id" value="@Model.id" />
     <input type="hidden" name="participantId" value="@Model.participantId" />
+    <p>You are collaborating in session @Model.id</p>
     <button type="submit" id="disconnect">Disconnect</button>
 </form>
 <style>
@@ -28,13 +28,13 @@
 <div id="messageActions">
     @await Html.PartialAsync("_SendMessageForm")
 
-    <form signalr-send="@nameof(ChatHub.SendMessage)" _="on htmx:signalr:beforeSend set detail.allParameters.message to SaveStateSnapshot()">
+    <form id="sharePatternForm" signalr-send="@nameof(ChatHub.SendMessage)" _="on htmx:signalr:beforeSend set detail.allParameters.message to SaveStateSnapshot()">
         <input type="hidden" name="id" value="@Model.id" />
         <input type="hidden" name="participantId" value="@Model.participantId" />
         <input type="hidden" name="messageType" value="@MessageType.ShareState" />
         <input type="hidden" name="message" value="" />
         <button type="submit">Share Pattern</button>
     </form>
-    <label for="shareUpdates">Share note updates live</label><input type="checkbox" id="shareUpdates" name="shareUpdates" />
+    <span id="shareUpdatesInput"><input type="checkbox" id="shareUpdates" name="shareUpdates" /><label for="shareUpdates">Share note updates live</label></span>
     <div style="display: none" signalr-subscribe="NoteChanged" hx-swap="innerHTML"></div>
 </div>
