@@ -3,7 +3,6 @@ using NoteFactory.Web;
 using NoteFactory.Web.Hubs;
 
 //TODO: undo/revert button after loading someone else's shared grid?
-//TODO: reverb
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddResponseCaching();

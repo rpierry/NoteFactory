@@ -9,8 +9,10 @@ class Synthesizer {
     private _delay: DelayNode;
     private _delayFeedback: GainNode;
     private _delayLevel: GainNode;
+    private _reverb: ConvolverNode;
+    private _reverbLevel: GainNode;
 
-    constructor(ctx: AudioContext) {
+    constructor(ctx: AudioContext, reverbIR: AudioBuffer) {
         this._ctx = ctx;
         this.envelope = new Envelope(this._ctx);
 
@@ -52,11 +54,24 @@ class Synthesizer {
         this._delay.connect(this._delayLevel);
         this._delayFeedback.connect(this._delay);
 
+        this._reverb =
+            new ConvolverNode(this._ctx,
+                {
+                    buffer: reverbIR
+                }); 
+        this._reverbLevel = this._ctx.createGain();                
+        this._reverb.connect(this._reverbLevel);
+        //mix both the delayed signal and the dry in
+        this._delayLevel.connect(this._reverb);
+        dry.connect(this._reverb);
+        
         this._outputGain = this._ctx.createGain();
         dry.connect(this._outputGain);
-        this._delayLevel.connect(this._outputGain);
+        this._delayLevel.connect(this._outputGain); //send the delayed signal out, even if no reverb
+        this._reverbLevel.connect(this._outputGain);
+
         this._outputGain.connect(this._ctx.destination);        
-    }
+    }    
 
     private throwIfNotPercentage(name: string, val: number) {
         if ((val < 0) || (val > 1)) throw new Error("Invalid " + name + " - must be between 0 and 1 inclusive");
@@ -103,6 +118,14 @@ class Synthesizer {
 
     set delayLevel(gain: number) {
         this._delayLevel.gain.value = gain;
+    }
+
+    get reverbLevel() {
+        return this._reverbLevel.gain.value;
+    }
+
+    set reverbLevel(gain: number) {
+        this._reverbLevel.gain.value = gain;
     }
 
     readonly envelope: Envelope;

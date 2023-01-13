@@ -17,7 +17,8 @@ interface StateSnapshot {
     sustainLevel: number,
     delayTime: number,
     delayFeedback: number,
-    delayLevel: number
+    delayLevel: number,
+    reverbLevel: number
 }
 
 const btnPlay: HTMLButtonElement = document.querySelector("#play");
@@ -39,6 +40,7 @@ const rngReleaseTime: HTMLInputElement = document.querySelector("#releaseTime");
 const rngDelayTime: HTMLInputElement = document.querySelector("#delayTime");
 const rngDelayFeedback: HTMLInputElement = document.querySelector("#delayFeedback");
 const rngDelayLevel: HTMLInputElement = document.querySelector("#delayLevel");
+const rngReverbLevel: HTMLInputElement = document.querySelector("#reverbLevel");
 const tblGrid: HTMLTableElement = document.querySelector("#noteGrid");
 
 btnPlay.addEventListener("click", Play);
@@ -56,16 +58,23 @@ rngReleaseTime.addEventListener("change", ChangeEnvelope, false);
 rngDelayTime.addEventListener("change", ChangeDelay, false);
 rngDelayFeedback.addEventListener("change", ChangeDelay, false);
 rngDelayLevel.addEventListener("change", ChangeDelay, false);
+rngReverbLevel.addEventListener("change", ChangeReverb, false);
 
 tblGrid.querySelectorAll("td.note").forEach(e => e.addEventListener("click", GridNoteClicked));
 
 const ctx = new AudioContext();
 
 const sequencer = new Sequencer(ctx, ScheduleNotes, StepChanged);
-const synthesizer = new Synthesizer(ctx);
+
+//had to set target/module to es2017/es2022 for this to work vs es6
+let ir = await fetch("BatteryRandol.wav");
+let buff = await ir.arrayBuffer();
+let decoded = await ctx.decodeAudioData(buff);
+const synthesizer = new Synthesizer(ctx, decoded);
 ChangeVolume();
 SetADRTimes();
 ChangeDelay();
+ChangeReverb();
 
 let playing = false;
 
@@ -171,6 +180,10 @@ function ChangeDelay() {
     synthesizer.delayTime = parseInt(rngDelayTime.value) / 1000.0;
     synthesizer.delayFeedback = parseFloat(rngDelayFeedback.value);
     synthesizer.delayLevel = parseFloat(rngDelayLevel.value);
+}
+
+function ChangeReverb() {
+    synthesizer.reverbLevel = parseFloat(rngReverbLevel.value);
 }
 
 function IsSubscribedToNoteUpdates() {
@@ -314,7 +327,8 @@ function SaveStateSnapshot(): string {
         sustainLevel: synthesizer.envelope.sustainLevel,
         delayTime: synthesizer.delayTime,
         delayFeedback: synthesizer.delayFeedback,
-        delayLevel: synthesizer.delayLevel
+        delayLevel: synthesizer.delayLevel,
+        reverbLevel: synthesizer.reverbLevel
     };
 
     //foreachnote only gets called for pattern steps that have notes, so we have to init
@@ -372,6 +386,9 @@ function LoadStateSnapshot(state: string) {
     rngDelayFeedback.value = objState.delayFeedback.toString();
     rngDelayLevel.value = objState.delayLevel.toString();
     ChangeDelay();
+
+    rngReverbLevel.value = objState.reverbLevel.toString();
+    ChangeReverb();
 }
 
 function ProcessIncomingNoteChange(el: HTMLElement) {
