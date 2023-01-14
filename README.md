@@ -9,3 +9,5 @@ The client side is a compelling example of why you should never let devs do visu
 I'm using Renerick's extension for htmx with SignalR and ASP.NET Core - https://github.com/Renerick/htmx-signalr - and mixing it with some standard SignalR calls that I make by grabbing the HubConnection from the extension on create.
 
 The reverb uses an IR from EchoThief - http://www.echothief.com/downloads/ 
+
+As of now this is running on a free azure instance here: https://notefactoryweb.azurewebsites.net/
