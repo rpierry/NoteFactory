@@ -12,6 +12,7 @@ class Synthesizer {
     private _reverb: ConvolverNode;
     private _reverbLevel: GainNode;
     private _thicknessNodes: GainNode[];
+    private _oneMinusThicknessNodes: GainNode[];
     
     private _split = 0.8;
     private _defaultThickness = 0.25;
@@ -29,7 +30,7 @@ class Synthesizer {
         this._connectOsc2To = osc2Pan;      
 
         let oscGain = this._ctx.createGain();
-        //oscGain.gain.value = this._oscBalance;        
+        oscGain.gain.value = 1 - this._defaultThickness; //keep the 2 oscs summing to 1
         oscPan.connect(oscGain);
 
         let osc2Gain = this._ctx.createGain();
@@ -41,12 +42,13 @@ class Synthesizer {
         this._connectSubTo = subMix;        
 
         let mainMix = this._ctx.createGain();
-        //mainMix.gain.value = 1 - this._subLevel;        
+        mainMix.gain.value = 1 - this._defaultThickness;
 
         oscGain.connect(mainMix);
         osc2Gain.connect(mainMix);
 
-        this._thicknessNodes = [osc2Gain, subMix];        
+        this._thicknessNodes = [osc2Gain, subMix];   
+        this._oneMinusThicknessNodes = [oscGain, mainMix];
 
         let dry = this._ctx.createGain();
         subMix.connect(dry);
@@ -108,6 +110,7 @@ class Synthesizer {
 
     set thickness(thickness: number) {
         this._thicknessNodes.forEach((n) => { n.gain.value = thickness; });
+        this._oneMinusThicknessNodes.forEach((n) => { n.gain.value = 1 - thickness; });
     }
 
     get delayTime() {
@@ -178,7 +181,7 @@ class Synthesizer {
 
         let sub = this._ctx.createOscillator();
         sub.type = "sine";
-        sub.frequency.value = frequency / 2;
+        sub.frequency.value = frequency / 4;
         sub.detune.value = this._subDetune;
         sub.addEventListener("ended", this.disconnectNode);
         let subEnv = getEnvelope();
